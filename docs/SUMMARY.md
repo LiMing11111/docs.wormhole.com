@@ -4,10 +4,10 @@
 
 ## 快速开始
 
-* [Developing Cross Chain Dapps](kuai-su-kai-shi/cross-chain-dev/README.md)
-  * [Standard Relayer](kuai-su-kai-shi/cross-chain-dev/standard-relayer.md)
-  * [Specialized Relayer](kuai-su-kai-shi/cross-chain-dev/specialized-relayer.md)
-* [Tutorials](kuai-su-kai-shi/tutorials/README.md)
+* [开发跨链Dapps](kuai-su-kai-shi/cross-chain-dev/README.md)
+  * [标准中继器](kuai-su-kai-shi/cross-chain-dev/standard-relayer.md)
+  * [专业中继器](kuai-su-kai-shi/cross-chain-dev/specialized-relayer.md)
+* [教程](kuai-su-kai-shi/tutorials/README.md)
   * [Hello Wormhole](kuai-su-kai-shi/tutorials/hello-wormhole/README.md)
     * [Hello Wormhole Explained](kuai-su-kai-shi/tutorials/hello-wormhole/hello-wormhole-explained.md)
     * [Beyond Hello Wormhole](kuai-su-kai-shi/tutorials/hello-wormhole/beyond-hello-wormhole.md)
