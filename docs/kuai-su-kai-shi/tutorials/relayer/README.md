@@ -1,4 +1,6 @@
-# Relayer Engine
+# Simple Relayer
+
+## Relayer Engine
 
 The Relayer Engine is a package meant to provide the structure and a starting point for a custom relayer.
 
@@ -8,13 +10,13 @@ Once a wormhole message is received, the developer may apply additional logic to
 
 To use the Relayer engine, a developer may specify how to relay wormhole messages for their app using an idiomatic express/koa middleware inspired api then let the library handle all the details!
 
-Checkout the [quick start](#quick-start) example here, or for a more advanced relayer app, see the [advanced example](./advanced-example.md)
+Checkout the [quick start](./#quick-start) example here, or for a more advanced relayer app, see the [advanced example](advanced-example.md)
 
-# Quick Start
+## Quick Start
 
 The source for this example is available [here](https://github.com/wormhole-foundation/relayer-engine/blob/main/examples/simple/src/app.ts)
 
-## Install Package
+### Install Package
 
 First, install the `relayer-engine` package with your favorite package manager
 
@@ -22,7 +24,7 @@ First, install the `relayer-engine` package with your favorite package manager
 npm i @wormhole-foundation/relayer-engine
 ```
 
-## Start Background Processes
+### Start Background Processes
 
 > note: These processes _must_ be running in order for the relayer app below to work
 
@@ -30,12 +32,13 @@ Next, we must start a Spy to listen for available VAAs published on the guardian
 
 More details about the Spy are available in the [docs](https://docs.wormhole.com/wormhole/explore-wormhole/spy)
 
-### Wormhole Network Spy
+#### Wormhole Network Spy
 
 In order for our Relayer app to receive messages, a local Spy must be running that watches the guardian network. Our relayer app will receive updates from this Spy.
 
 <details>
-<summary><b>Testnet Spy</b></summary>
+
+<summary>Testnet Spy</summary>
 
 ```bash
 docker run --platform=linux/amd64 \
@@ -50,7 +53,8 @@ spy \
 </details>
 
 <details>
-<summary><b>Mainnet Spy</b></summary>
+
+<summary>Mainnet Spy</summary>
 
 ```bash
 docker run --platform=linux/amd64 \
@@ -64,7 +68,7 @@ spy \
 
 </details>
 
-### Redis Persistence
+#### Redis Persistence
 
 > Note: While we're using Redis here, the persistence layer can be swapped out for some other db by implementing the appropriate [interface](https://github.com/wormhole-foundation/relayer-engine/blob/main/relayer/storage/redis-storage.ts).
 
@@ -74,7 +78,7 @@ A Redis instance must also be available to persist job data for fetching VAAs fr
 docker run --rm -p 6379:6379 --name redis-docker -d redis
 ```
 
-## Simple Relayer Code Example
+### Simple Relayer Code Example
 
 In the following example, we'll:
 
@@ -123,7 +127,7 @@ import { CHAIN_ID_SOLANA } from "@certusone/wormhole-sdk";
 })();
 ```
 
-### Explanation
+#### Explanation
 
 The first meaningful line instantiates the `StandardRelayerApp`, which is a subclass of the `RelayerApp` with common defaults.
 
@@ -138,9 +142,8 @@ export class StandardRelayerApp<
 The only field we pass in the `StandardRelayerAppOpts` is the name to help with identifying log messages and reserve a namespace in Redis.
 
 <details>
-<summary>
-Other `StandardRelayerAppOpts` options
-</summary>
+
+<summary>Other `StandardRelayerAppOpts` options</summary>
 
 ```ts
   wormholeRpcs?: string[];  // List of URLs from which to query missed VAAs
@@ -178,17 +181,14 @@ The last line in the simple example runs `await app.listen()`, which will start 
 
 This will run until the process is killed or it encounters an unrecoverable error. If you'd like to shut down the relayer gracefully, call `app.stop()`.
 
-## Advanced Example
+### Advanced Example
 
-For a more advanced example that details other middleware and more complex configuration and actions including a built in UI, see the [Advanced Tutorial](./advanced-example.md)
+For a more advanced example that details other middleware and more complex configuration and actions including a built in UI, see the [Advanced Tutorial](advanced-example.md)
 
 {% hint style="info" %}
-
-## Wormhole integration complete?
+### Wormhole integration complete?
 
 Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
 
 [Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
-
 {% endhint %}
-

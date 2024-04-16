@@ -1,4 +1,4 @@
-# Building Your First Cross-Chain Application
+# Hello Wormhole
 
 This tutorial contains a solidity contract (`HelloWormhole.sol`) that can be deployed onto many EVM chains to form a fully functioning cross-chain application.
 
@@ -10,15 +10,15 @@ This also allows users to pay for their custom greeting to be emitted on a chain
 
 Included in the [repository](https://github.com/wormhole-foundation/hello-wormhole) is:
 
-- Example Solidity Code
-- Example Forge local testing setup
-- Testnet Deploy Scripts
-- Example Testnet testing setup
+* Example Solidity Code
+* Example Forge local testing setup
+* Testnet Deploy Scripts
+* Example Testnet testing setup
 
 ### Environment Setup
 
-- Node 16.14.1 or later, npm 8.5.0 or later: [https://docs.npmjs.com/downloading-and-installing-node-js-and-npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-- forge 0.2.0 or later: [https://book.getfoundry.sh/getting-started/installation](https://book.getfoundry.sh/getting-started/installation)
+* Node 16.14.1 or later, npm 8.5.0 or later: [https://docs.npmjs.com/downloading-and-installing-node-js-and-npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+* forge 0.2.0 or later: [https://book.getfoundry.sh/getting-started/installation](https://book.getfoundry.sh/getting-started/installation)
 
 ### Testing Locally
 
@@ -43,8 +43,8 @@ Test result: ok. 1 passed; 0 failed; finished in 3.98s
 
 You will need a wallet with at least 0.05 Testnet AVAX and 0.01 Testnet CELO.
 
-- [Obtain testnet AVAX here](https://core.app/tools/testnet-faucet/?token=C)
-- [Obtain testnet CELO here](https://faucet.celo.org/alfajores)
+* [Obtain testnet AVAX here](https://core.app/tools/testnet-faucet/?token=C)
+* [Obtain testnet CELO here](https://faucet.celo.org/alfajores)
 
 ```bash
 EVM_PRIVATE_KEY=your_wallet_private_key npm run deploy
@@ -278,19 +278,16 @@ Users with any wallet can request greetings to be emitted on any chain that is p
 
 ### How does it work?
 
-[Check out Part 2](./hello-wormhole-explained.md) for an in-depth explanation of how Wormhole Relayer causes contracts on other blockchains to be called with the appropriate inputs!
+[Check out Part 2](hello-wormhole-explained.md) for an in-depth explanation of how Wormhole Relayer causes contracts on other blockchains to be called with the appropriate inputs!
 
 ### Full Cross-chain HelloWormhole solidity contract
 
 See the [full implementation of the HelloWormhole.sol contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/HelloWormhole.sol) and the [full Github repository with testing infrastructure](https://github.com/wormhole-foundation/hello-wormhole/)
 
 {% hint style="info" %}
-
-## Wormhole integration complete?
+### Wormhole integration complete?
 
 Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
 
 [Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
-
 {% endhint %}
-

@@ -1,17 +1,17 @@
-# Beyond HelloWormhole - Protections, Refunds, Chained Deliveries, and More
+# Beyond Hello Wormhole
 
-In Part 1 ([HelloWormhole](./README.md)), we wrote a fully functioning cross-chain application that allows users to request, from one contract, that a `GreetingReceived` event to be emitted from one of the other contracts on a different chain.
+In Part 1 ([HelloWormhole](./)), we wrote a fully functioning cross-chain application that allows users to request, from one contract, that a `GreetingReceived` event to be emitted from one of the other contracts on a different chain.
 
-In Part 2 ([How does Hello Wormhole Work?](./hello-wormhole-explained.md)), we discussed how the Wormhole Relayer contract works behind the scenes. In summary, it works by publishing a wormhole message with delivery instructions, which alerts a delivery provider to call the `deliver` endpoint of the Wormhole Relayer contract on the target chain, finally calling the designated `targetAddress` with the correct inputs
+In Part 2 ([How does Hello Wormhole Work?](hello-wormhole-explained.md)), we discussed how the Wormhole Relayer contract works behind the scenes. In summary, it works by publishing a wormhole message with delivery instructions, which alerts a delivery provider to call the `deliver` endpoint of the Wormhole Relayer contract on the target chain, finally calling the designated `targetAddress` with the correct inputs
 
 HelloWormhole is a great example application, but has much room for improvement. Let's talk through some ways to improve both the security and features of the application!
 
 Topics covered:
 
-- Restricting the sender
-- Refunds
-- Chained Deliveries
-- Delivering existing VAAs
+* Restricting the sender
+* Refunds
+* Chained Deliveries
+* Delivering existing VAAs
 
 ## Protections
 
@@ -110,11 +110,11 @@ targetChainRefundPerGasUnused * (gasLimit - gasUsed)
 
 will be sent to address `refundAddress` on the target chain.
 
-- **gasUsed** is the amount of gas your contract (at `targetAddress`) uses in the call to `receiveWormholeMessages`.
+* **gasUsed** is the amount of gas your contract (at `targetAddress`) uses in the call to `receiveWormholeMessages`.
 
 > Note that this must be less than or equal to gasLimit.
 
-- **targetChainRefundPerGasUnused** is a constant quoted pre-delivery by the delivery provider - this is the second return value of the `quoteEVMDeliveryPrice` function:
+* **targetChainRefundPerGasUnused** is a constant quoted pre-delivery by the delivery provider - this is the second return value of the `quoteEVMDeliveryPrice` function:
 
 ```solidity
 function quoteEVMDeliveryPrice(
@@ -126,9 +126,8 @@ function quoteEVMDeliveryPrice(
 
 **else** (if refundChain is not equal to targetChain), then
 
-1. The cost to perform a delivery with a gas limit and receiver value of 0 to the refund chain will be calculated (let’s call it BASE_COST)
-
-2. **if** `TARGET_CHAIN_REFUND = targetChainRefundPerGasUnused * (gasLimit - gasUsed)` **is larger than BASE_COST**, then a delivery will be performed, and the `msg.value` that will be sent to `refundAddress` on `refundChain` will be
+1. The cost to perform a delivery with a gas limit and receiver value of 0 to the refund chain will be calculated (let’s call it BASE\_COST)
+2. **if** `TARGET_CHAIN_REFUND = targetChainRefundPerGasUnused * (gasLimit - gasUsed)` **is larger than BASE\_COST**, then a delivery will be performed, and the `msg.value` that will be sent to `refundAddress` on `refundChain` will be
 
 ```solidity
 targetChainWormholeRelayer.quoteNativeForChain(refundChain, TARGET_CHAIN_REFUND - BASE_COST, deliveryProviderAddress)
@@ -183,12 +182,9 @@ function sendVaasToEvm(
 For an example usage of this, see the Wormhole Solidity SDK’s implementation of [sendTokenWithPayloadToEvm](https://github.com/wormhole-foundation/wormhole-solidity-sdk/blob/main/src/WormholeRelayerSDK.sol#L131), which use the TokenBridge wormhole module to send tokens!
 
 {% hint style="info" %}
-
-## Wormhole integration complete?
+### Wormhole integration complete?
 
 Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
 
 [Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
-
 {% endhint %}
-

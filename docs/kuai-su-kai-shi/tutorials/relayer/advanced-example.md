@@ -1,6 +1,6 @@
-# Example Relayer Engine Application
+# Advanced Relayer Example
 
-This example details a more complex implementation of a Relayer Application. For a simple example see this [example](./README.md#simple-relayer-code-example)
+This example details a more complex implementation of a Relayer Application. For a simple example see this [example](./#simple-relayer-code-example)
 
 The source for this example is available [here](https://github.com/wormhole-foundation/relayer-engine/blob/main/examples/advanced/src/app.ts)
 
@@ -192,12 +192,9 @@ If you'd like to apply some specific intermediate processing steps, consider imp
 If you'd prefer a storage layer besides redis, simply implement the [storage](https://github.com/wormhole-foundation/relayer-engine/blob/main/relayer/storage/storage.ts) interface.
 
 {% hint style="info" %}
-
-## Wormhole integration complete?
+### Wormhole integration complete?
 
 Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
 
 [Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
-
 {% endhint %}
-

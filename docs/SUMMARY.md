@@ -1,23 +1,23 @@
 # Table of contents
 
-* [Introduction](README.md)
+* [介绍](README.md)
 
-## Quick Start
+## 快速开始
 
-* [Developing Cross Chain Dapps](tutorials/quick-start/cross-chain-dev/README.md)
-  * [Standard Relayer](tutorials/quick-start/cross-chain-dev/standard-relayer.md)
-  * [Specialized Relayer](tutorials/quick-start/cross-chain-dev/specialized-relayer.md)
-* [Tutorials](tutorials/README.md)
-  * [Hello Wormhole](tutorials/quick-start/hello-wormhole/README.md)
-    * [Hello Wormhole Explained](tutorials/quick-start/hello-wormhole/hello-wormhole-explained.md)
-    * [Beyond Hello Wormhole](tutorials/quick-start/hello-wormhole/beyond-hello-wormhole.md)
-  * [Hello Token](tutorials/quick-start/hello-token/README.md)
-  * [CCTP](tutorials/quick-start/cctp/README.md)
-    * [USDC Transfers With Connect SDK](tutorials/quick-start/cctp/sdk.md)
-  * [Simple Relayer](tutorials/quick-start/relayer/README.md)
-    * [Advanced Relayer Example](tutorials/quick-start/relayer/advanced-example.md)
-* [Demos](tutorials/demos.md)
-* [Wormhole Connect: Bridging Made Easy](tutorials/quick-start/wh-connect.md)
+* [Developing Cross Chain Dapps](kuai-su-kai-shi/cross-chain-dev/README.md)
+  * [Standard Relayer](kuai-su-kai-shi/cross-chain-dev/standard-relayer.md)
+  * [Specialized Relayer](kuai-su-kai-shi/cross-chain-dev/specialized-relayer.md)
+* [Tutorials](kuai-su-kai-shi/tutorials/README.md)
+  * [Hello Wormhole](kuai-su-kai-shi/tutorials/hello-wormhole/README.md)
+    * [Hello Wormhole Explained](kuai-su-kai-shi/tutorials/hello-wormhole/hello-wormhole-explained.md)
+    * [Beyond Hello Wormhole](kuai-su-kai-shi/tutorials/hello-wormhole/beyond-hello-wormhole.md)
+  * [Hello Token](kuai-su-kai-shi/tutorials/hello-token.md)
+  * [CCTP](kuai-su-kai-shi/tutorials/cctp/README.md)
+    * [USDC Transfers With Connect SDK](kuai-su-kai-shi/tutorials/cctp/sdk.md)
+  * [Simple Relayer](kuai-su-kai-shi/tutorials/relayer/README.md)
+    * [Advanced Relayer Example](kuai-su-kai-shi/tutorials/relayer/advanced-example.md)
+* [Demos](kuai-su-kai-shi/demos.md)
+* [Wormhole Connect: Bridging Made Easy](kuai-su-kai-shi/wh-connect.md)
 
 ## Explore Wormhole
 
