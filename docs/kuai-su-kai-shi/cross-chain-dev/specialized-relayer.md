@@ -6,7 +6,7 @@ Wormhole 与许多[生态系统](../../blockchain-environments/)兼容，集成�
 
 ## 链上
 
-为了在不同链之间发送和接收信息，了解一些[链上组件](../../reference/components/#on-chain-components)是很重要的。&#x20;
+为了在不同链之间发送和接收信息，了解一些[链上组件](../../tan-suo-chong-dong-wormhole/components.md#on-chain-components)是很重要的。&#x20;
 
 ### 发送信息
 
@@ -16,7 +16,7 @@ Wormhole 与许多[生态系统](../../blockchain-environments/)兼容，集成�
 
 {% tabs %}
 {% tab title="EVM" %}
-使用 `IWormhole` 接口（[source](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/IWormhole.sol)），我们可以直接向[核心合约](../../reference/components/core-contracts.md)发布信息。
+使用 `IWormhole` 接口（[source](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/IWormhole.sol)），我们可以直接向[核心合约](../../tan-suo-chong-dong-wormhole/core-contracts.md)发布信息。
 
 ```solidity
 // ...
@@ -84,10 +84,10 @@ More details in [Example Source](https://github.com/wormhole-foundation/wormhole
 {% endtab %}
 {% endtabs %}
 
-Once the message is emitted from the core contract, the [Guardian Network](../../reference/components/guardian.md) will observe the message and sign the digest of an Attestation ([VAA](../../reference/components/vaa.md)). We'll discuss this in more depth in the [Off Chain](specialized-relayer.md#off-chain) section below.
+Once the message is emitted from the core contract, the [Guardian Network](../../tan-suo-chong-dong-wormhole/guardian.md) will observe the message and sign the digest of an Attestation ([VAA](../../tan-suo-chong-dong-wormhole/vaa.md)). We'll discuss this in more depth in the [Off Chain](specialized-relayer.md#off-chain) section below.
 
 {% hint style="info" %}
-By default, VAAs are [multicast](../../reference/components/core-contracts.md#multicast). This means there is no default **target chain** for a given message. It's up to the application developer to decide on the format of the message and its treatment on receipt.
+By default, VAAs are [multicast](../../tan-suo-chong-dong-wormhole/core-contracts.md#multicast). This means there is no default **target chain** for a given message. It's up to the application developer to decide on the format of the message and its treatment on receipt.
 {% endhint %}
 
 ### Receiving a message
@@ -146,11 +146,11 @@ More details in [Example Source](https://github.com/wormhole-foundation/wormhole
 {% endtab %}
 {% endtabs %}
 
-In addition to environment specific checks that should be performed, a contract should take care to check other [fields in the body](../../reference/components/vaa.md#body) such as:
+In addition to environment specific checks that should be performed, a contract should take care to check other [fields in the body](../../tan-suo-chong-dong-wormhole/vaa.md#body) such as:
 
 * **Emitter**: Is this coming from an emitter address and chain id I expect? Typically contracts will provide a method to register a new emitter and check the incoming message against the set of emitters it trusts.
 * **Sequence**: Is this the sequence number I expect? How should I handle out of order deliveries?
-* **Consistency Level**: For the chain this message came from, is the [consistency level](../../reference/components/core-contracts.md#consistencylevel) enough to guarantee the transaction wont be reverted after I take some action?
+* **Consistency Level**: For the chain this message came from, is the [consistency level](../../tan-suo-chong-dong-wormhole/core-contracts.md#consistencylevel) enough to guarantee the transaction wont be reverted after I take some action?
 
 Outside of body of the VAA, but also relevant, is the digest of the VAA which can be used for replay protection by checking if the digest has already been seen.
 
@@ -158,17 +158,17 @@ Since the payload itself is application specific, there may be other elements to
 
 ## Off Chain
 
-In order to shuttle messages between chains, some [off chain processes](../../reference/components/#off-chain-components) are involved. The [Guardians](../../reference/components/guardian.md) observe the events from the core contract and sign a [VAA](../../reference/components/vaa.md).
+In order to shuttle messages between chains, some [off chain processes](../../tan-suo-chong-dong-wormhole/components.md#off-chain-components) are involved. The [Guardians](../../tan-suo-chong-dong-wormhole/guardian.md) observe the events from the core contract and sign a [VAA](../../tan-suo-chong-dong-wormhole/vaa.md).
 
 After enough Guardians have signed the message (at least `2/3 + 1` or 13 of 19 guardians), the VAA is available to be delivered to a target chain.
 
-Once the VAA is available, a [Relayer](../../reference/components/relayer.md) may deliver it in a properly formatted transaction to the target chain.
+Once the VAA is available, a [Relayer](../../tan-suo-chong-dong-wormhole/relayer.md) may deliver it in a properly formatted transaction to the target chain.
 
 ### Specialized Relayer
 
 A relayer is needed to deliver the VAA containing the message to the target chain. When the relayer is written specifically for a custom application, it's referred to as a [Specialized Relayer](specialized-relayer.md)
 
-A specialized relayer might be as simple as an in browser process that polls the [API](../../reference/api-docs/) for the availability of a VAA after submitting a transaction and delivers it to the target chain. It might also be implemented with a [Spy](../../reference/components/spy.md) coupled with some daemon listening for VAAs from a relevant `chainID` and `emitter` then taking action when one is observed.
+A specialized relayer might be as simple as an in browser process that polls the [API](../../reference/api-docs/) for the availability of a VAA after submitting a transaction and delivers it to the target chain. It might also be implemented with a [Spy](../../tan-suo-chong-dong-wormhole/spy.md) coupled with some daemon listening for VAAs from a relevant `chainID` and `emitter` then taking action when one is observed.
 
 #### Simple Relayer
 
@@ -295,4 +295,4 @@ See the [Specialized Relayer Tutorial](../../tutorials/app-integration/specializ
 
 ## Reference
 
-Read more about the architecture and core components [here](../../reference/components/)
+Read more about the architecture and core components [here](../../tan-suo-chong-dong-wormhole/components.md)

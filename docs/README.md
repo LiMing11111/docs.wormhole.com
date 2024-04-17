@@ -5,7 +5,7 @@ Wormhole is a generic **message passing protocol** that enables communication be
 ![Overview](.gitbook/assets/oversimplified.jpg)
 
 {% hint style="success" %}
-The above is an _oversimplified_ illustration of the protocol, details about the architecture and components are available [here](reference/components/)
+The above is an _oversimplified_ illustration of the protocol, details about the architecture and components are available [here](tan-suo-chong-dong-wormhole/components.md)
 {% endhint %}
 
 This simple **message passing protocol** enables developers and users of [cross chain applications](reference/glossary.md#xdapps) built by developers to leverage the advantages of multiple ecosystems.
@@ -38,7 +38,7 @@ More tutorials are available [here](tutorials/quick-start/).
 
 Find out more about the Wormhole ecosystem, components, and protocols.
 
-<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>Architecture</strong></td><td>Dig into the components of the protocol</td><td><a href="reference/components/">components</a></td><td><a href=".gitbook/assets/detailed-flow.jpg">detailed-flow.jpg</a></td></tr><tr><td><strong>Protocol Specifications</strong></td><td>Find out more about the protocols built on top of Wormhole</td><td><a href="https://github.com/wormhole-foundation/wormhole/tree/main/whitepapers">https://github.com/wormhole-foundation/wormhole/tree/main/whitepapers</a></td><td><a href=".gitbook/assets/protocols.png">protocols.png</a></td></tr></tbody></table>
+<table data-card-size="large" data-view="cards" data-full-width="false"><thead><tr><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td><strong>Architecture</strong></td><td>Dig into the components of the protocol</td><td><a href="tan-suo-chong-dong-wormhole/components.md">components.md</a></td><td><a href=".gitbook/assets/detailed-flow.jpg">detailed-flow.jpg</a></td></tr><tr><td><strong>Protocol Specifications</strong></td><td>Find out more about the protocols built on top of Wormhole</td><td><a href="https://github.com/wormhole-foundation/wormhole/tree/main/whitepapers">https://github.com/wormhole-foundation/wormhole/tree/main/whitepapers</a></td><td><a href=".gitbook/assets/protocols.png">protocols.png</a></td></tr></tbody></table>
 
 ### Demos
 

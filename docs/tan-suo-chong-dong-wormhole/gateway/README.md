@@ -79,7 +79,7 @@ IBC Composability 中间件位于 [PFM (Packet Forwarding Module)](https://githu
 
 一旦在 Gateway 收到，该资产的 CW20 表现形式将通过 IBC 使用已建立的 [ICS20 protocol](https://github.com/cosmos/ibc/tree/main/spec/app/ics-020-fungible-token-transfer) 发送到目的地链。&#x20;
 
-使用 [SDK](../../sdk-docs/) 的一个示例：
+使用 [SDK](../../reference/sdk-docs/) 的一个示例：
 
 ```ts
 import * as wh from '@certusone/wormhole-sdk';
@@ -186,7 +186,7 @@ pub enum GatewayIbcTokenBridgePayload {
 
 Cosmos 链的 `recipient` 地址也是采用 base64 编码的 bech32 地址。例如，如果 `recipient` 是 `wormhole1f3jshdsmzl03v03w2hswqcfmwqf2j5csw223ls`，则编码将是 `d29ybWhvbGUxZjNqc2hkc216bDAzdjAzdzJoc3dxY2Ztd3FmMmo1Y3N3MjIzbHM=` 的直接 base64 编码。&#x20;
 
-`chain` 的值对应于 [Wormhole chain IDs](../../glossary.md#chain-id)。
+`chain` 的值对应于 [Wormhole chain IDs](../../reference/glossary.md#chain-id)。
 
 `fee` 和 `nonce` 都是 Wormhole 特有的参数，但两者现在都未使用。
 

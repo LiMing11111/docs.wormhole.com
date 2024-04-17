@@ -19,17 +19,17 @@
 * [Demos](kuai-su-kai-shi/demos.md)
 * [Wormhole Connect: Bridging Made Easy](kuai-su-kai-shi/wh-connect.md)
 
-## Explore Wormhole
+## 探索虫洞（Wormhole）
 
-* [Architecture](reference/components/README.md)
-* [Security](reference/security.md)
-* [Core Contracts](reference/components/core-contracts.md)
-* [Guardians](reference/components/guardian.md)
-* [VAAs](reference/components/vaa.md)
-* [Relayers](reference/components/relayer.md)
-* [Spy](reference/components/spy.md)
-* [Gateway](reference/components/gateway/README.md)
-  * [Onboarding](reference/components/gateway/onboard.md)
+* [架构](tan-suo-chong-dong-wormhole/components.md)
+* [安全性](tan-suo-chong-dong-wormhole/security.md)
+* [核心合约](tan-suo-chong-dong-wormhole/core-contracts.md)
+* [Guardians](tan-suo-chong-dong-wormhole/guardian.md)
+* [VAAs](tan-suo-chong-dong-wormhole/vaa.md)
+* [Relayers](tan-suo-chong-dong-wormhole/relayer.md)
+* [Spy](tan-suo-chong-dong-wormhole/spy.md)
+* [Gateway](tan-suo-chong-dong-wormhole/gateway/README.md)
+  * [Onboarding](tan-suo-chong-dong-wormhole/gateway/onboard.md)
 
 ## Reference
 

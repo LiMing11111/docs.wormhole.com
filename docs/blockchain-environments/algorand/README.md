@@ -1,14 +1,14 @@
+# Algorand
 
 Details for working with Algorand environment chains.
 
-## Developer Tools
+### Developer Tools
 
 The recommended development tool for Algorand is [Algokit](https://developer.algorand.org/docs/get-started/algokit/).
 
+### Addresses
 
-## Addresses
-
-Because Wormhole works with many environments, the Wormhole address format is normalized. 
+Because Wormhole works with many environments, the Wormhole address format is normalized.
 
 For Algorand chains, this means a wormhole formatted address is the 58 character address decoded from base32 with its checksum removed.
 
@@ -18,64 +18,56 @@ Algorand also uses a uint64 for Asset and Application IDs. These are converted t
 
 e.g. `123` => `0x000000000000000000000000000000000000000000000000000000000000007b`
 
-## Emitter 
+### Emitter
 
-The emitter is the application address, normalized to the wormhole address format. 
+The emitter is the application address, normalized to the wormhole address format.
 
+## Algorand
 
-<!--ALGORAND_CHAIN_DETAILS-->
+### Ecosystem
 
-# Algorand
+* [Web site](https://algorand.com)
+* [Algoexplorer](https://algoexplorer.io/) | [AlgoScan](https://algoscan.app)
+* [Developer Docs](https://developer.algorand.org) | [Faucet](https://bank.testnet.algorand.network/)
 
-## Ecosystem
+### Wormhole Details
 
-- [Web site](https://algorand.com)
-- [Algoexplorer](https://algoexplorer.io/) | [AlgoScan](https://algoscan.app)
-- [Developer Docs](https://developer.algorand.org) | [Faucet](https://bank.testnet.algorand.network/)
+* **Name**: `algorand`
+* **Chain ID**: `8`
+* **Contract Source**: [algorand/wormhole\_core.py](https://github.com/wormhole-foundation/wormhole/blob/main/algorand/wormhole\_core.py)
 
-## Wormhole Details
+#### Consistency Levels
 
-- **Name**: `algorand`
-- **Chain ID**: `8`
-- **Contract Source**: [algorand/wormhole_core.py](https://github.com/wormhole-foundation/wormhole/blob/main/algorand/wormhole_core.py)
+The options for [consistencyLevel](../../tan-suo-chong-dong-wormhole/core-contracts.md#consistencyLevel) (i.e finality) are:
 
-### Consistency Levels
-
-The options for [consistencyLevel](../../reference/components/core-contracts.md#consistencyLevel) (i.e finality) are:
-
-|Level|Value|
-|-----|-----|
-|Finalized|0|
+| Level     | Value |
+| --------- | ----- |
+| Finalized | 0     |
 
 This field is may be ignored since the chain provides instant finality.
 
+For more information see [https://developer.algorand.org/docs/get-started/basics/why\_algorand/#finality](https://developer.algorand.org/docs/get-started/basics/why\_algorand/#finality)
 
-For more information see [https://developer.algorand.org/docs/get-started/basics/why_algorand/#finality](https://developer.algorand.org/docs/get-started/basics/why_algorand/#finality)
+#### Mainnet Contracts (`mainnet-v1.0`)
 
+| Type         | Contract    |
+| ------------ | ----------- |
+| Core         | `842125965` |
+| Token Bridge | `842126029` |
+| NFT Bridge   | **N/A**     |
 
-### Mainnet Contracts (<code>mainnet-v1.0</code>)
+#### Testnet Contracts (`testnet-v1.0`)
 
-|Type|Contract|
-|----|--------|
-|Core|`842125965`|
-|Token Bridge|`842126029`|
-|NFT Bridge|**N/A**|
+| Type         | Contract   |
+| ------------ | ---------- |
+| Core         | `86525623` |
+| Token Bridge | `86525641` |
+| NFT Bridge   | **N/A**    |
 
-### Testnet Contracts (<code>testnet-v1.0</code>)
+#### Local Network Contract
 
-|Type|Contract|
-|----|--------|
-|Core|`86525623`|
-|Token Bridge|`86525641`|
-|NFT Bridge|**N/A**|
-
-### Local Network Contract
-
-|Type|Contract|
-|----|--------|
-|Core|`1004`|
-|Token Bridge|`1006`|
-|NFT Bridge|**N/A**|
-  
-
-<!--ALGORAND_CHAIN_DETAILS-->
+| Type         | Contract |
+| ------------ | -------- |
+| Core         | `1004`   |
+| Token Bridge | `1006`   |
+| NFT Bridge   | **N/A**  |
