@@ -1,8 +1,8 @@
-# 常量参考
+# Constants Reference
 
-## 链 Ids
+## Chain Ids
 
-下面的文档The following table documents the [chain ids](glossary.md#chain-id) used by wormhole.
+The following table documents the [chain ids](glossary.md#chain-id) used by wormhole.
 
 {% hint style="warning" %}
 Note the Wormhole chain ids are different than the more commonly referenced chain ids (e.g. https://eips.ethereum.org/EIPS/eip-155)

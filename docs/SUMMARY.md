@@ -33,7 +33,7 @@
 
 ## Reference
 
-* [常量参考](reference/constants.md)
+* [Constants Reference](reference/constants.md)
 * [Development Environment](reference/dev-env/README.md)
   * [Tilt](reference/dev-env/tilt.md)
   * [Tooling](reference/dev-env/tooling.md)

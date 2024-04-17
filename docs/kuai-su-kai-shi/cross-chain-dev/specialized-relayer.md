@@ -1,22 +1,22 @@
-# Specialized Relayer
+# 专业中继器
 
-![Specialized Relayer](../../.gitbook/assets/specialized-relayer.png)
+![专业中继器](../../.gitbook/assets/specialized-relayer.png)
 
-Wormhole is compatible with many [ecosystems](../../blockchain-environments/) and integration is straight forward.
+Wormhole 与许多[生态系统](../../blockchain-environments/)兼容，集成非常简单。
 
-## On Chain
+## 链上
 
-In order to send and receive messages between chains, some [on chain components](../../reference/components/#on-chain-components) are important to understand.
+为了在不同链之间发送和接收信息，了解一些[链上组件](../../reference/components/#on-chain-components)是很重要的。&#x20;
 
-### Sending a message
+### 发送信息
 
-To send a message, regardless of the environment or chain, the core contract is invoked with a message argument from an [emitter](../../reference/glossary.md#emitter).
+要发送信息，无论环境或链如何，核心合约都要调用来自 [emitter](../../reference/glossary.md#emitter) 的信息参数。
 
-This `emitter` may be your contract or an existing application such as the [Token Bridge](https://github.com/wormhole-foundation/wormhole/blob/main/whitepapers/0003\_token\_bridge.md), or [NFT Bridge](https://github.com/wormhole-foundation/wormhole/blob/main/whitepapers/0006\_nft\_bridge.md).
+该 `emitter` 可能事你的合约或现有的应用程序，如 [Token Bridge](https://github.com/wormhole-foundation/wormhole/blob/main/whitepapers/0003\_token\_bridge.md)，或 [NFT Bridge](https://github.com/wormhole-foundation/wormhole/blob/main/whitepapers/0006\_nft\_bridge.md)。
 
 {% tabs %}
 {% tab title="EVM" %}
-Using the `IWormhole` interface ([source](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/IWormhole.sol)), we can publish a message directly to the [core contract](../../reference/components/core-contracts.md).
+使用 `IWormhole` 接口（[source](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/IWormhole.sol)），我们可以直接向[核心合约](../../reference/components/core-contracts.md)发布信息。
 
 ```solidity
 // ...

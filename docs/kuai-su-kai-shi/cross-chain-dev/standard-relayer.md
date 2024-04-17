@@ -1,27 +1,27 @@
-# Standard Relayer
+# 标准中继器
 
-![Standard Relayer](../../.gitbook/assets/auto-relayer.png)
+![标准中继器](../../.gitbook/assets/auto-relayer.png)
 
-The Standard Relayer provides a mechanism for a contract on one chain to send a message to a contract on a different chain without the developer dealing with any off chain deployments.
+标准中继器为一个链上合约提供了一种机制，使其能够向另一条链上的合约发送消息，开发者无需处理任何链下部署。
 
 {% hint style="warning" %}
-Currently the Standard Relayer feature is limited to EVM environments.
+目前，标准中继器功能仅限于 EVM 环境。
 
-Find the complete list of EVM environment blockchains [here](../../blockchain-environments/evm/).
+点击[此处](../../blockchain-environments/evm/)查看 EVM 环境区块链的完整列表。
 {% endhint %}
 
-## Tutorials
+## 教程
 
-* [Hello Wormhole](../../tutorials/quick-start/) A tutorial that covers message passing across EVM environments
-* [Hello Token](../tutorials/hello-token.md) A tutorial that covers token transfer across EVM environments
+* [Hello Wormhole](../../tutorials/quick-start/) 一个涵盖跨 EVM 生态的信息传递的教程
+* [Hello Token](../tutorials/hello-token.md) 一个涵盖跨 EVM 生态的代币转移的教程
 
-## On Chain
+## 链上
 
-On chain, a smart contract interacts with the [IWormholeRelayer](https://github.com/wormhole-foundation/wormhole-relayer-solidity-sdk/blob/main/src/interfaces/IWormholeRelayer.sol) to send and receive messages.
+在链上，智能合约通过 [IWormholeRelayer](https://github.com/wormhole-foundation/wormhole-relayer-solidity-sdk/blob/main/src/interfaces/IWormholeRelayer.sol) 进行发送和接收交互。
 
-### Sending a message
+### 发送信息
 
-To send a message to a contract on another EVM chain, we can call the `sendPayloadToEvm` method, provided by the `IWormholeRelayer` interface.
+要向另一条 EVM 链上的合约发送信息，我们可以调用 `IWormholeRelayer` 接口提供的 `sendPayloadToEvm` 方法。
 
 ```solidity
 function sendPayloadToEvm(
@@ -41,9 +41,9 @@ function sendPayloadToEvm(
 );
 ```
 
-The `sendPayloadToEvm` method is marked `payable` so we can pay for our transaction to be submitted.
+`sendPayloadToEvm` 方法被标记为 `payable` ，因此我们可以为我们的交易付款，使其能够被提交。
 
-The value to attach to the invocation is determined by calling the `quoteEVMDeliveryPrice`, which provides an estimate of the cost of gas on the target chain.
+通过调用 `quoteEVMDeliveryPrice` 来确定附加到调用的值，它提供了目标链上 gas 成本的估计值。
 
 ```solidity
 function quoteEVMDeliveryPrice(
@@ -61,9 +61,9 @@ function quoteEVMDeliveryPrice(
 );
 ```
 
-This method should be called prior to sending a message and the value returned for `nativePriceQuote` should be attached to the call to send the payload in order to cover the cost of the transaction on the target chain.
+此方法应该在发送信息之前调用，并且应该在调用发送有效负载时，将返回的nativePriceQuote值添加到其中，以支付目标链上的交易成本。
 
-In total, sending a message across EVM chains can be as simple as:
+总的来说，跨 EVM 链发送信息可以很简单：
 
 ```solidity
 // Get a quote for the cost of gas for delivery
@@ -83,9 +83,9 @@ wormholeRelayer.sendPayloadToEvm{value: cost}(
 );
 ```
 
-### Receiving a message
+### 接收信息
 
-To receive a message using the `Standard Relayer` feature, the target contract must implement the [IWormholeReceiver](https://github.com/wormhole-foundation/wormhole-relayer-solidity-sdk/blob/main/src/interfaces/IWormholeReceiver.sol) interface.
+要使用 `Standard Relayer` 功能接收信息， 目标合约必须实现 [IWormholeReceiver](https://github.com/wormhole-foundation/wormhole-relayer-solidity-sdk/blob/main/src/interfaces/IWormholeReceiver.sol) 接口。
 
 ```solidity
 function receiveWormholeMessages(
@@ -97,34 +97,34 @@ function receiveWormholeMessages(
 ) external payable;
 ```
 
-The logic inside the function body may be whatever business logic is required to take action on the specific payload.
+函数内部的逻辑可以是执行针对特定有效负载所需的任何业务逻辑。
 
-### Other Considerations
+### 其它注意事项
 
-Some implementation details should be considered during development to ensure safety and improve UX.
+在开发过程中应考虑一些实现细节，以确保安全和改善用户体验。
 
-* Receiving a message from relayer
-  * Check for expected emitter
-  * call parseAndVerify on any additionalVAAs
-* Replay protection
-* Message Ordering
-  * no guarantees on order of messages delivered
-* Fowarding/Call Chaining
-* Refunding overpayment of gasLimit
-* Refunding overpayment of value sent
+* 从中继器接收信息
+  * 检查预期的发射器
+  * 在任何 additionalVAAs上调用 parseAndVerify&#x20;
+* 重放保护
+* 信息有序性
+  * 不保证发送信息的顺序
+* 链式转发/调用
+* 退还多付的 gasLimit
+* 退还多付的金额
 
-## Off Chain
+## 链下
 
-If taking advantage of Automatic Relaying, no off chain logic need be implemented.
+如果利用自动中继功能，则不需要实现链下逻辑。
 
-While no off chain programs are required, a developer may want to track the progress of messages in flight. To track the progress of messages in flight, use the worm CLI tool's `status` subcommand.
+虽然不需要链下程序，但开发人员可能希望跟踪传输中的信息的进度。要跟踪传输中消息的进度，请使用 worm CLI  工具的 `status`  子命令。
 
 ```sh
 $ worm status mainnet ethereum 0xdeadbeef
 ```
 
-See the [CLI tool docs](../../reference/cli-docs/) for installation and usage.
+请参阅 [CLI 工具文档](../../reference/cli-docs/)了解安装和使用方法。
 
-## See Also
+## 另请参阅
 
-Reference documentation for EVM chains is available [here](../../blockchain-environments/evm/)
+有关 EVM 链的参考文档，请点击[此处](../../blockchain-environments/evm/) 。

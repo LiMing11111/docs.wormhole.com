@@ -1,44 +1,44 @@
-# Developing Cross Chain Dapps
+# 开发跨链Dapps
 
-If you haven't read the Wormhole [introduction](../../) to understand what Cross Chain Development is and how developers and Dapps can benefit from it, please start there.
+如果你还没有阅读 Wormhole 的[介绍](../../)来了解什么是跨链开发以及开发者和 Dapps 如何从中受益，请从这里开始。
 
-[VAAs](../../reference/components/vaa.md) are the core messaging primitive in Wormhole. You can think of them as packets of cross chain data that are emitted any time a cross chain application contract interacts with the Core Contract.
+[VAAs](../../reference/components/vaa.md) 是 Wormhole 协议中的核心信息传递原型。你可以将其视为跨链数据包，每当跨链应用合约与核心合约进行交互时，都会发出这些数据包。
 
-[Relayers](../../reference/components/relayer.md) in the Wormhole context are processes that deliver Verifiable Action Approvals (VAAs) to their destination, playing a crucial role in Wormhole's security model. They can't compromise security, only liveness, and act as delivery mechanisms for VAAs without the capacity to tamper with the outcome.
+在 Wormhole 的环境下，[中继器](../../reference/components/relayer.md)是将 Verifiable Action Approvals（VAAs）发送到其目标链的进程，在 Wormhole 的安全模型中扮演着至关重要的作用。它们无法破坏安全性，只会影响有效性，并充当 VAAs 的交付机制，但没有能力篡改结果。
 
-When building a cross chain application, there are two primary ways to relay messages (VAAs) with Wormhole.
+在构建跨链应用程序时，使用 Wormhole 传递消息（VAAs）的方式主要有两种。
 
-1. [Automatic Relaying](./#automatic-relaying) - No off chain code required
-2. [Specialized Relaying](./#specialized-relayer) - Some off chain code may be required
+1. [自动中继](./#zi-dong-zhong-ji) - 无需链下代码
+2. [专业中继](./#zhuan-ye-zhong-ji-qi) - 可能需要一些链下代码
 
 {% hint style="info" %}
-The components outlined in **blue** are those that must be implemented by the developer
+蓝色框出的组件是开发人员必须实现的组件。The components outlined in **blue** are those that must be implemented by the developer
 {% endhint %}
 
-### Automatic Relaying
+### 自动中继
 
 {% hint style="warning" %}
-Automatic Relaying is currently only supported for EVM environments.
+目前只有 EVM 环境支持自动中继。
 {% endhint %}
 
-![Standard Relayer](../../.gitbook/assets/auto-relayer.png)
+![标准中继器](../../.gitbook/assets/auto-relayer.png)
 
-With Automatic Relaying, only the contracts need to be developed. Leave the message delivery to a service provider.
+有了自动中继功能，只需制定合同。将信息传递交给服务提供商即可。
 
-[Read More](standard-relayer.md)
+[阅读更多](standard-relayer.md)
 
-[Quick Start](../tutorials/hello-wormhole/)
+[快速开始](../tutorials/hello-wormhole/)
 
-### Specialized Relayer
+### 专业中继器
 
-![Specialized Relayer](../../.gitbook/assets/specialized-relayer.png)
+![专业中继器](../../.gitbook/assets/specialized-relayer.png)
 
-With Specialized Relaying, the developer can communicate with [any blockchain Wormhole supports](../../blockchain-environments/) and has the freedom to choose a delivery strategy.
+通过专业中继，开发者可以与 [Wormhole 支持的任何区块链](../../blockchain-environments/)进行通信，并可自由选择交付策略。
 
-[Read More](specialized-relayer.md)
+[阅读更多](specialized-relayer.md)
 
-[Quick Start](../tutorials/relayer/)
+[快速开始](../tutorials/relayer/)
 
-### More
+### 更多
 
-More tutorials are available [here](../tutorials/).
+更多教程请点击[这里](../tutorials/)。

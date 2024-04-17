@@ -1,94 +1,86 @@
+# Gateway
 
-## Overview
+### 概览
 
-_Wormhole Gateway_ is a Cosmos-SDK chain that provides a way to bridge non-native assets into the Cosmos ecosystem and serves as a source for unified liquidity across Cosmos chains.
+Wormhole Gateway 是一个基于 Cosmos-SDK 的链，提供了一种将非原生资产桥接到 Cosmos 生态系统中的方式，并作为 Cosmos 链间统一流动性的来源。
 
 {% hint style="success" %}
-Because IBC is used to bridge assets from Gateway to Cosmos chains, liquidity fragmentation is avoided and liquidity for foreign assets bridged via Wormhole into Cosmos is unified across Cosmos chains.
+因为使用 IBC（Inter-Blockchain Communication）从 Gateway 桥接资产到 Cosmos 链，避免了流动性的碎片化，并且通过 Wormhole 桥接到 Cosmos 生态系统中的外部资产在 Cosmos 的各个链之间能够实现流动性的统一。
 {% endhint %}
 
-In addition to facilitating asset transfers,  _Wormhole Gateway_ (FKA `wormchain`, AKA `Shai-Hulud`) allows Wormhole to ensure proper accounting with the [accountant](https://github.com/wormhole-foundation/wormhole/blob/main/whitepapers/0011_accountant.md). 
+除了促进资产转移外，Wormhole Gateway（前称 `wormchain`，又名 `Shai-Hulud`）还允许 Wormhole 与 [accountant](https://github.com/wormhole-foundation/wormhole/blob/main/whitepapers/0011\_accountant.md) 确保正确的账务处理。
 
+### 详细说明
 
-## Details
+Wormhole Gateway 是作为一组合约和模块实现的。&#x20;
 
-Wormhole Gateway is implemented as a set of contracts and modules.
+这些组件的合约地址是：
 
-The contract addreses for these components are:
+| 合约                    | 主网地址                                                                  | 测试网地址                                                                 |
+| --------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Wormhole core bridge  | `wormhole1ufs3tlq4umljk0qfe8k5ya0x6hpavn897u2cnf9k0en9jr7qarqqaqfk2j` | `wormhole16jzpxp0e8550c9aht6q9svcux30vtyyyyxv5w2l2djjra46580wsazcjwp` |
+| Wormhole token bridge | `wormhole1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjq4lyjmh` | `wormhole1aaf9r6s7nxhysuegqrxv0wpm27ypyv4886medd3mrkrw6t4yfcnst3qpex` |
+| IBC Translator        | `wormhole14ejqjyq8um4p3xfqj74yld5waqljf88fz25yxnma0cngspxe3les00fpjx` | `wormhole1ctnjk7an90lz5wjfvr3cf6x984a8cjnv8dpmztmlpcq4xteaa2xs9pwmzk` |
 
-| Contract | Mainnet Address | Testnet Address |
-| -------- | ------- |---------|
-|Wormhole core bridge| `wormhole1ufs3tlq4umljk0qfe8k5ya0x6hpavn897u2cnf9k0en9jr7qarqqaqfk2j`|`wormhole16jzpxp0e8550c9aht6q9svcux30vtyyyyxv5w2l2djjra46580wsazcjwp`|
-|Wormhole token bridge| `wormhole1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjq4lyjmh`|`wormhole1aaf9r6s7nxhysuegqrxv0wpm27ypyv4886medd3mrkrw6t4yfcnst3qpex`|
-|IBC Translator| `wormhole14ejqjyq8um4p3xfqj74yld5waqljf88fz25yxnma0cngspxe3les00fpjx`|`wormhole1ctnjk7an90lz5wjfvr3cf6x984a8cjnv8dpmztmlpcq4xteaa2xs9pwmzk`|
+#### Wormhole 核心合约
 
+在需要通用消息传递的每个 Cosmos 链上，仍需要部署用于发送消息和验证 [Guardian](../guardian.md) 签名的[核心合约](https://app.gitbook.com/o/SK9htrrKEoxzXNcFitC5/s/uLLPBOibnlYmSJX40vn0/)。值得注意的是，对于 Gateway 代币桥接，不需要部署任何核心合约。
 
+#### IBC Shim 合约
 
-### Wormhole Core Contracts
+一个 CosmWasm 合约，通过在 Wormhole 和 IBC 消息格式之间进行转换，处理进入和离开 Cosmos 生态系统的桥接。它维护了一个从 `chainId -> channelId` 的映射，用于白名单上的 IBC 通道以发送和接收数据包。
 
-The [core contracts](../core-contracts.md) to emit messages and verify [Guardian](../guardian.md) signatures are still required on each Cosmos chain that requires generic message passing. Notably, for Gateway token bridging, no core contracts need be deployed.
+该合约通过接收 [Contract Controlled Transfer VAAs](../vaa.md#token--message) 支持转入 Cosmos 生态系统的转账。
 
-### IBC Shim Contract
+这类转账的逻辑流程如下：&#x20;
 
-A CosmWasm contract that handles bridging into and out of the Cosmos ecosystem by translating between Wormhole and IBC message formats. It maintains a mapping of `chainId -> channelId` for whitelisted IBC channels to send packets over and accept packets from.
+* 在  [Token Bridge](../core-contracts.md#token-bridge) 上兑换 VAA&#x20;
+* 铸造 [Token Factory](./#token-factory-module) 代币&#x20;
+* 解码附加的负载作为 [`GatewayIbcTokenBridgePayload`](./#gatewayibctokenbridgepayload)
+* 通过 IBC 将代币发送到目的地 Cosmos 链&#x20;
 
-The contract supports transfers _into_ the Cosmos ecosystem by receiving [Contract Controlled Transfer VAAs](../vaa.md#token--message).
+该合约还通过实现一个 `execute` 处理器来支持从 Cosmos 生态系统转出，该处理器接受一个 [`GatewayIbcTokenBridgePayload`](./#gatewayibctokenbridgepayload) 和一定数量的 Token Factory 代币（作为要桥接出去的代币）在 `info.funds` 中。&#x20;
 
-The logical flow of this type of transfer is as follows:
+这类转账的逻辑流程如下：
 
-- Redeem the VAA against the [Token Bridge](../core-contracts.md#token-bridge)
-- Mint [Token Factory](#token-factory-module) tokens
-- Decode the additional payload as a [`GatewayIbcTokenBridgePayload`](#gatewayibctokenbridgepayload)
-- Send tokens via IBC to destination cosmos chains
+* 销毁 [Token Factory](./#token-factory-module) 代币&#x20;
+* 解锁 CW20 代币&#x20;
+* 授权 [Token Bridge](../core-contracts.md#token-bridge) 使用 CW20 代币&#x20;
+* 根据 [`GatewayIbcTokenBridgePayload`](./#gatewayibctokenbridgepayload) 是 `Simple` 类型还是 `ContractControlled` 类型，调用 `InitiateTransfer` 或 `InitiateTransferWithPayload`
 
-The contract also supports transfers _out of_ the Cosmos ecosystem by implementing an `execute` handler which accepts a [`GatewayIbcTokenBridgePayload`](#gatewayibctokenbridgepayload) and an amount of tokenfactory tokens in `info.funds` (which are the tokens to be bridged out). 
+#### Token Factory 模块
 
+在 Wormhole Gateway 上部署标准的 [Token Factory](https://github.com/CosmosContracts/juno/tree/v14.1.1/x/tokenfactory) 模块，以创建新的代币。&#x20;
 
-The logical flow for this type of transfer is as follows:
+#### IBC Composability 中间件
 
-- Burn the [Token Factory](#token-factory-module) tokens 
-- Unlock the CW20 tokens
-- Grant approval to the [Token Bridge](../core-contracts.md#token-bridge) to spend the CW20 Tokens
-- Call `InitiateTransfer` or `InitiateTransferWithPayload` based on whether the [`GatewayIbcTokenBridgePayload`](#gatewayibctokenbridgepayload) is of type `Simple` or `ContractControlled`
+IBC Composability 中间件位于 [PFM (Packet Forwarding Module)](https://github.com/strangelove-ventures/packet-forward-middleware) 和 IBC Hooks 中间件之上，将这两者结合起来。它使 Cosmos 链上的集成者能够使用单一的负载结构支持 `Cosmos -> Cosmos` 和 `Cosmos -> External`的流程。
 
-### Token Factory Module
+它接受一个 [`GatewayIbcTokenBridgePayload`](./#gatewayibctokenbridgepayload) 负载，并通过查看负载中的 `chainId` 来决定是调用 PFM 还是 IBC Hooks 中间件。&#x20;
 
-A deployment of the canonical [Token Factory](https://github.com/CosmosContracts/juno/tree/v14.1.1/x/tokenfactory) module on Wormhole Gateway to create new tokens.
+1. 如果 `chainId` 是一个支持 IBC 的链，它将为 PFM 格式化一个负载，以将 ICS20 转账转发到目的地支持 IBC 的链。&#x20;
+2. 如果 `chainId` 是一个外部链，它将为 IBC Hooks 中间件格式化一个负载，以调用 IBC Shim 合约的 `execute` 处理器以实现桥接出去。
 
-### IBC Composability Middleware
+#### IBC Hooks 中间件
 
-The IBC Composability Middleware sits on top of the [PFM (Packet Forwarding Module)](https://github.com/strangelove-ventures/packet-forward-middleware) and IBC Hooks middleware to compose the two together. It enables integrators on Cosmos chains to support both the `Cosmos -> Cosmos` and `Cosmos -> External` flows with a single payload structure.
+在 Wormhole Gateway 上部署 [IBC Hooks 中间件](https://github.com/osmosis-labs/osmosis/tree/v15.2.0/x/ibc-hooks)，允许 ICS-20 代币转移同时启动合约调用。&#x20;
 
-It accepts a payload of [`GatewayIbcTokenBridgePayload`](#gatewayibctokenbridgepayload) and determines whether to call the PFM or IBC Hooks middleware by looking up the `chainId` in the payload.
+### 集成
 
-1. If the `chainId` is an IBC-enabled chain, it formats a payload for the PFM to forward the ICS20 transfer to the IBC-enabled destination chain. 
-2. If the `chainId` is an external chain, it will format a payload for the IBC Hooks middleware to call the IBC Shim contract’s `execute` handler to bridge out.
+通过几行代码即可实现与 Wormhole Gateway 的集成，支持以下功能：&#x20;
 
-### IBC Hooks Middleware
+* 从外部链到任何支持的 Cosmos 链的转移，见 [Into Cosmos](./#into-cosmos)
+* 从任何支持的 Cosmos 链到外部链的转移，见 [Out of Comsos](./#out-of-cosmos)
+* 在任何支持的 Cosmos 链之间的转移，见 [Between Cosmos Chains](./#between-cosmos-chains)
 
-A deployment of the [IBC Hooks Middleware](https://github.com/osmosis-labs/osmosis/tree/v15.2.0/x/ibc-hooks) on Wormhole Gateway allows ICS-20 token transfers to also initiate contract calls.
+#### Into Cosmos
 
-## Integration
+为了将资产桥接进入一个 Cosmos 链，将在外部链上启动一个资产转移，其 [payload](./#gatewayibctokenbridgepayload) 由 Gateway 或更具体地说是 [IBC Shim Contract](./#ibc-shim-contract) 理解。&#x20;
 
-Integration with Wormhole Gateway can be accomplished with a few lines of code and supports 
+一旦在 Gateway 收到，该资产的 CW20 表现形式将通过 IBC 使用已建立的 [ICS20 protocol](https://github.com/cosmos/ibc/tree/main/spec/app/ics-020-fungible-token-transfer) 发送到目的地链。&#x20;
 
-- Transfers from an **External Chain** to any supported **Cosmos Chain**, see [Into Cosmos](#into-cosmos)
-- Transfers from any supported **Cosmos Chain** to an **External Chain**, see [Out of Comsos](#out-of-cosmos)
-- Transfers between any supported **Cosmos Chains**, see [Between Cosmos Chains](#between-cosmos-chains)
+使用 [SDK](../../sdk-docs/) 的一个示例：
 
-### Into Cosmos
-
-To bridge assets into a Cosmos chain, an asset transfer is initiated on the foreign chain with a [payload](#gatewayibctokenbridgepayload) that is understood by the Gateway, or more specifically, the [IBC Shim Contract](#ibc-shim-contract). 
-
-Once received on the Gateway, the asset's CW20 representation is sent to the destination chain through IBC using the well established [ICS20 protocol](https://github.com/cosmos/ibc/tree/main/spec/app/ics-020-fungible-token-transfer).
-
-
-<!-- 
-Wormhole core bridge: wormhole1ufs3tlq4umljk0qfe8k5ya0x6hpavn897u2cnf9k0en9jr7qarqqaqfk2j
-Wormhole token bridge: wormhole1466nf3zuxpya8q9emxukd7vftaf6h4psr0a07srl5zw74zh84yjq4lyjmh
--->
-
-An example using the [SDK](../../sdk-docs/README.md):
 ```ts
 import * as wh from '@certusone/wormhole-sdk';
 
@@ -122,11 +114,13 @@ await txReceipt = wh.transferFromEth(
 
 // ...
 ```
-### Out of Cosmos
 
-To bridge assets out of the Cosmos ecosystem or between Cosmos chains, an IBC transfer is initiated on the source chain to the Gateway with a payload containing details about the transfer in the `memo` field.
+#### Out of Cosmos
 
-For example, using [cosmjs](https://github.com/cosmos/cosmjs):
+为了将资产从 Cosmos 生态系统桥接出去或在 Cosmos 链之间进行桥接，将在源链上启动一个 IBC 转账，转账到 Gateway，并在 `memo` 字段中包含有关转账的详细信息。
+
+例如，使用 [cosmjs](https://github.com/cosmos/cosmjs)：
+
 ```ts
 const wallet = await DirectSecp256k1HdWallet.fromMnemonic(faucet.mnemonic);
 const client = await SigningStargateClient.connectWithSigner(
@@ -159,17 +153,17 @@ const result = await client.sendIbcTokens(
 );
 ```
 
-### Between Cosmos Chains
+#### Between Cosmos Chains
 
-Transfers between Cosmos chains work exactly the same as [bridging out of Cosmos](#out-of-cosmos) from an implementation perspective. The exception being that the `chain` id passed is a Cosmos chain.
+从实现的角度看，Cosmos 链之间的转移与从 [Cosmos 桥接出去](./#out-of-cosmos)的操作完全相同。不同之处在于传递的 `chain` ID 是一个 Cosmos 链。
 
-## Datastructures
+### 数据结构
 
-Core datastructures that are used by the Gateway protocol.
+由 Gateway 协议使用的核心数据结构。&#x20;
 
-### GatewayIbcTokenBridgePayload
+#### GatewayIbcTokenBridgePayload
 
-The core datastructure of Gateway token transfers is the `GatewayIbcTokenBridgePayload`, containing details about the transfer that the Gateway uses to perform the transfer. 
+代币转移的核心数据结构是 `GatewayIbcTokenBridgePayload`，其中包含了 Gateway 用来执行转移的转移详情。
 
 ```rust
 pub enum GatewayIbcTokenBridgePayload {
@@ -188,48 +182,36 @@ pub enum GatewayIbcTokenBridgePayload {
 }
 ```
 
-When sending a `GatewayIbcTokenBridge` payload, it must be serialized as json.
+当发送 `GatewayIbcTokenBridge` 负载时，必须将其序列化为 json 格式。 为了正确的 json 编码，`Binary` 值需采用 base64 编码。&#x20;
 
-For a proper json, encoding The `Binary` values are base64 encoded.
+Cosmos 链的 `recipient` 地址也是采用 base64 编码的 bech32 地址。例如，如果 `recipient` 是 `wormhole1f3jshdsmzl03v03w2hswqcfmwqf2j5csw223ls`，则编码将是 `d29ybWhvbGUxZjNqc2hkc216bDAzdjAzdzJoc3dxY2Ztd3FmMmo1Y3N3MjIzbHM=` 的直接 base64 编码。&#x20;
 
-The `recipient` for cosmos chain chains are base64 encoded bech32 addresses. For example, if the `recipient` is `wormhole1f3jshdsmzl03v03w2hswqcfmwqf2j5csw223ls`, the encoding will be the direct base64 encoding of `d29ybWhvbGUxZjNqc2hkc216bDAzdjAzdzJoc3dxY2Ztd3FmMmo1Y3N3MjIzbHM=`.
+`chain` 的值对应于 [Wormhole chain IDs](../../glossary.md#chain-id)。
 
-The `chain` values map to [Wormhole chain IDs](../../glossary.md#chain-id). 
+`fee` 和 `nonce` 都是 Wormhole 特有的参数，但两者现在都未使用。
 
-The `fee` and `nonce` are Wormhole-specific parameters, both of which are unused today.
+对于从 Cosmos/IBC 链来的传入 IBC 消息，`receiver` 字段将在 `Simple.recipient` 字段中使用 base64 编码，并且 `channel-id` 将作为等效的 wormhole `chain` id 包含进来。
 
-For incoming IBC messages from Cosmos/IBC chains, the `receiver` field will be base64 encoded in the `Simple.recipient`  field, and the `channel-id` will be included as the equivalent wormhole`chain` id.
+### 费用结构
 
-## Fee Structure
+使用 Gateway 的费用很低。目前，源链的 gas 费是唯一的成本。
 
-The fees for using Gateway are minimal. At the moment, the source chain gas is the only cost.
+#### 需要支付的费用
 
-### Fees Required
+* 源链气体费用：必须支付源链（例如以太坊）的 Gas 费用。&#x20;
+* 中继费用 \[源链 => Gateway]：处理 Wormhole 消息的成本。当前为 0，但将来可能会变化。
+* 目的链 Gas 费用 \[非 Cosmos]：目的链（例如以太坊）的 Gas 费用必须由中继方或在手动赎回的情况下由用户支付。
 
-- **Source Chain Gas**: Gas fees on the source chain (e.g. Ethereum) must be covered.
-- **Relayer Fee [Source Chain => Gateway]**:  The cost for a wormhole message to be processed. This is currently `0` but may change in the future. 
-- **Destination Chain Gas [Non Cosmos]**: Gas fees on a destination chain (e.g. Ethereum) must be covered by either the relayer or, in the case of manual redemption, the user.
+#### 不需要支付的费用
 
-### Fees Not Required 
+* Gateway：Gateway 没有基于代币定价的计量或要求用户支付 gas 费用。&#x20;
+* 中继费用 \[Gateway => Cosmos]：中继者不通过用户费用获得激励。&#x20;
+* 目的链 \[Cosmos]：IBC 中继者承担目的链上的处理成本。
 
-- **Gateway**: Gateway doesn't have token-priced metering or require gas fees to be paid by the user.
-- **Relayer Fee [Gateway => Cosmos]**: Relayers aren't incentivized by user fees.
-- **Destination Chain [Cosmos]**: IBC relayers cover the processing cost on the destination chain.
+### 另见
 
+[Gateway 区块浏览器](https://bigdipper.live/wormhole)&#x20;
 
-## See Also 
+当然，Wormhole Gateway 是开源的，源代码可在[此处](https://github.com/wormhole-foundation/wormhole/tree/main/wormchain)获取。&#x20;
 
-[Gateway Block Explorer](https://bigdipper.live/wormhole)
-
-
-_Wormhole Gateway_ is, of course, open source and the source is available [here](https://github.com/wormhole-foundation/wormhole/tree/main/wormchain)
-
-<!-- TODO: change branch to `main` once merged -->
-The contracts that make this possible are available [here](https://github.com/wormhole-foundation/wormhole/tree/gateway-integration/cosmwasm/contracts)
-
-<!-- TODO: outdated?
-A protocol description for generic message passing using the Gateway is available [here](https://github.com/wormhole-foundation/wormhole/blob/mainnet/whitepapers/0012_ibc_generic_messaging.md).
-For more details about the design, see the [design document](https://github.com/wormhole-foundation/wormhole/blob/gateway-integration/wormchain/design/design.md).
-Also, the [roadmap](https://github.com/wormhole-foundation/wormhole/blob/gateway-integration/wormchain/design/roadmap.md) document provides information on future feature implementations.
--->
-
+实现这些功能的合约在[此处](https://github.com/wormhole-foundation/wormhole/tree/gateway-integration/cosmwasm/contracts)。
