@@ -3,49 +3,49 @@
 ## Wormhole Gateway 使用指南
 
 {% hint style="info" %}
-以下内容是给任何希望启用来自Gateway的桥接功能的Cosmos链开发者看的，Gateway是一个利用Wormhole Guardian网络实现从以太坊到Cosmos轻松桥接的Wormhole Cosmos链。: [The Gateway to Cosmos](https://wormhole.com/gateway/)
+以下内容是给任何希望启用来自 Gateway 的桥接功能的 Cosmos 链开发者看的，Gateway 是一个利用 Wormhole Guardian 网络实现从以太坊到 Cosmos 轻松桥接的Wormhole Cosmos 链 : [The Gateway to Cosmos](https://wormhole.com/gateway/)
 {% endhint %}
 
-## 步骤1. 建议将您的链添加到 Wormhole Guardians
+## 步骤 1. 建议将您的链添加到 Wormhole Guardians
 
-1. 在Wormhole Gateway下通过填写Cosmos链治理提案模板开启一个新的GitHub讨论 - [这里](https://github.com/wormhole-foundation/wormhole/discussions/new?category=gateway)
-2. 允许96小时进行讨论和治理投票。
+1. 在 Wormhole Gateway 下通过填写 Cosmos 链治理提案模板开启一个新的 GitHub 讨论 - [这里](https://github.com/wormhole-foundation/wormhole/discussions/new?category=gateway)
+2. 允许 96 小时进行讨论和治理投票。
 
 ## 步骤 2. 加入 Wormhole Discord
 
 1. 加入 wormhole discord ([link](https://discord.gg/wormholecrypto))
-2. 向版主Susu (`susu.wormhole`)发送消息, 以便加入 `#guardian-cosmos` 频道。
+2. 向版主 Susu (`susu.wormhole`) 发送消息, 以便加入 `#guardian-cosmos` 频道。
 
-## 步骤3. 建立一个IBC连接
+## 步骤 3. 建立一个 IBC 连接
 
-1. 将您的IBC relayer(s)添加到Wormhole Gateway的白名单。
-   1. IBC中继器应通过 `wormchaind` CLI生成一个地址 - [这里](https://github.com/wormhole-foundation/wormhole/tree/main/wormchain).
+1. 将您的 IBC relayer(s) 添加到 Wormhole Gateway 的白名单。
+   1. IBC 中继器应通过 `wormchaind` CLI 生成一个地址 - [这里](https://github.com/wormhole-foundation/wormhole/tree/main/wormchain).
    2. 填写 [IBC relayer allowlist request template](onboard.md#ibc-relayer-allowlist-request-template).
    3. 在`#guardian-cosmos` 频道发布请求。
-2. 建立IBC连接。
-   1. 请确保设置`trusting_period`和`trust_threshold`参数到最安全的值。例如，`trust_threshold` 应为2/3，`trusting_period` 应为您链的解绑期的2/3。
-   2. 参见Wormhole Gateway的IBC中继器配置示例 [下方](onboard.md#wormhole-gateway-ibc-zhong-ji-qi-pei-zhi)。
-   3. 请查看[此处](https://github.com/wormhole-foundation/wormhole/blob/main/wormchain/syncing.md)的文档了解如何设置您自己的Wormhole Gateway节点以连接您的IBC中继器。或者，您可以在[cosmos链注册](https://github.com/cosmos/chain-registry/blob/master/gateway/chain.json)上查看可用的公共节点。
-3. 在`#guardian-cosmos`频道共享IBC连接细节，并请求Wormhole贡献者准备IBC连接的治理。
-   1. 允许48小时进行接受此IBC通道的治理投票。
+2. 建立 IBC 连接。
+   1. 请确保设置`trusting_period`和`trust_threshold`参数到最安全的值。例如，`trust_threshold` 应为 2/3，`trusting_period` 应为您链的解绑期的 2/3。
+   2. 参见 Wormhole Gateway 的 IBC 中继器配置示例 [下方](onboard.md#wormhole-gateway-ibc-zhong-ji-qi-pei-zhi)。
+   3. 请查看[此处](https://github.com/wormhole-foundation/wormhole/blob/main/wormchain/syncing.md)的文档了解如何设置您自己的 Wormhole Gateway 节点以连接您的 IBC 中继器。或者，您可以在 [cosmos 链注册](https://github.com/cosmos/chain-registry/blob/master/gateway/chain.json)上查看可用的公共节点。
+3. 在`#guardian-cosmos`频道共享 IBC 连接细节，并请求 Wormhole 贡献者准备 IBC 连接的治理。
+   1. 允许 48 小时进行接受此 IBC 通道的治理投票。
 
-## 步骤4. \[可选] 使用Wormhole Connect集成UI
+## 步骤 4. \[可选] 使用 Wormhole Connect 集成 UI
 
-[Wormhole Connect](https://wormhole.com/connect/) 是一种将桥接功能直接嵌入到您的应用中的方式，仅需3行代码。[集成 Connect](https://wormhole-connect-builder.netlify.app/) 快速、可定制，并将Wormhole的所有功能和实用性直接带入您自己的应用程序。
+[Wormhole Connect](https://wormhole.com/connect/) 是一种将桥接功能直接嵌入到您的应用中的方式，仅需 3 行代码。[集成 Connect](https://wormhole-connect-builder.netlify.app/) 快速、可定制，并将 Wormhole 的所有功能和实用性直接带入您自己的应用程序。
 
-请参考这些参考PR将您的Cosmos链添加到Wormhole Connect。您的PR需要由Wormhole核心贡献者审查和合并。
+请参考这些参考 PR 将您的 Cosmos 链添加到 Wormhole Connect。您的 PR 需要由 Wormhole 核心贡献者审查和合并。
 
-1. 将您的Cosmos链ID添加到Wormhole SDK：[PR #3381 · wormhole-foundation/wormhole (github.com)](https://github.com/wormhole-foundation/wormhole/pull/3381/files)
-2. 将您的Cosmos链添加到Wormhole Connect：[PR #1009 · wormhole-foundation/wormhole-connect (github.com)](https://github.com/wormhole-foundation/wormhole-connect/pull/1009/files)
+1. 将您的 Cosmos 链 ID 添加到 Wormhole SDK：[PR #3381 · wormhole-foundation/wormhole (github.com)](https://github.com/wormhole-foundation/wormhole/pull/3381/files)
+2. 将您的 Cosmos 链添加到 Wormhole Connect：[PR #1009 · wormhole-foundation/wormhole-connect (github.com)](https://github.com/wormhole-foundation/wormhole-connect/pull/1009/files)
 
-## 步骤5. 将桥接资产添加到Cosmos链注册表及其他相关钱包和前端注册表
+## 步骤 5. 将桥接资产添加到 Cosmos 链注册表及其他相关钱包和前端注册表
 
-1. 无需许可地证明您希望桥接到您链上的资产（如果尚未证明）至Wormhole Gateway。
-2. 提交相关PR以确保探索器、钱包和其他UI在您的链上桥接Wormhole资产时能够识别这些资产。
-   1. 示例PR，将Wormhole资产添加到Osmosis Mintscan（[示例](https://github.com/cosmostation/chainlist/pull/865)）。
+1. 无需许可地证明您希望桥接到您链上的资产（如果尚未证明）至 Wormhole Gateway。
+2. 提交相关 PR 以确保浏览器、钱包和其他 UI 在您的链上桥接 Wormhole 资产时能够识别这些资产。
+   1. 示例 PR，将 Wormhole 资产添加到 Osmosis Mintscan（[示例](https://github.com/cosmostation/chainlist/pull/865)）。
 
 {% hint style="success" %}
-🎉 恭喜！您已成功将您的Cosmos链连接到Gateway。如果您有任何问题，请联系Wormhole Discord上的Susu。
+🎉 恭喜！您已成功将您的 Cosmos 链连接到 Gateway。如果您有任何问题，请联系Wormhole Discord 上的 Susu。
 {% endhint %}
 
 ## IBC Relayer Allowlist Request Template
@@ -62,7 +62,7 @@ We understand that if this address misbehaves, the sponsoring Guardian can remov
 Thank you!
 ```
 
-## Wormhole Gateway IBC 中继器 配置
+## Wormhole Gateway IBC 中继器配置
 
 ```toml
 [global]
