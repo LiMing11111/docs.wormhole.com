@@ -29,7 +29,7 @@
 * [Relayers](tan-suo-chong-dong-wormhole/relayer.md)
 * [Spy](tan-suo-chong-dong-wormhole/spy.md)
 * [Gateway](tan-suo-chong-dong-wormhole/gateway/README.md)
-  * [Onboarding](tan-suo-chong-dong-wormhole/gateway/onboard.md)
+  * [引导](tan-suo-chong-dong-wormhole/gateway/onboard.md)
 
 ## Reference
 
