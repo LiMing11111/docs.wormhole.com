@@ -1,67 +1,74 @@
-# Guardian
+<!--
+ * @Author: “crislee” ‘505267309@qq.com’
+ * @Date: 2024-04-18 18:28:03
+ * @LastEditors: “crislee” ‘505267309@qq.com’
+ * @LastEditTime: 2024-04-19 14:17:00
+ * @FilePath: /docs.wormhole.com/docs/tan-suo-chong-dong-wormhole/guardian.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+# Guardian (守护者)
+
+Wormhole 依赖一组分布式节点，这些节点监控几个区块链上的状态。在 Wormhole 中，这些节点被称为 Guardians。当前的 guardian 集合可以在 [Wormhole Explorer](https://wormhole.com/network/) 中看到。
+
+Guardian 的角色是观察消息并签署相应的 payloads 每个 Guardian 都独立执行此步骤，然后将结果签名与其他 Guardians 的签名合并为最终步骤。由独立观察结果组成的多签名形成了一个多重签名，代表一个状态已被 wormhole 网络的大多数成员观察并同意。这些多重签名在 Wormhole 中被称为 VAAs。
+
+# Guardian 网络
+
+Guardian 网络旨在作为 Wormhole 的预言机组件，整个 Wormhole 生态系统建立在其技术基础上。它是 Wormhole 生态系统中最关键的元素，如果你想深入了解 Wormhole，这是最重要的组件。
+
+为了不仅理解 Guardian 网络的工作方式，还要理解其工作原因，让我们首先回顾一下关键的设计考虑因素。为了成为一流的互操作平台，Wormhole 需要具备五个关键特性：
+
+1. **去中心化** - 网络的控制需要在许多方之间分散。
+2. **模块化** - 生态系统中的不同部分，如预言机、中继器、应用程序等，应保持尽可能独立和模块化，以便它们可以独立设计、修改和升级。
+3. **链无关性** - Wormhole 应该能够支持不仅是 EVM，还有像 Solana、Algorand、Cosmos 以及尚未创建的平台。它也不应该有任何一个链作为单点故障。
+4. **可扩展性** - Wormhole 应该能够立即保护大量价值，并能够处理大量交易量。
+5. **可升级性** - 随着去中心化计算生态系统的发展，Wormhole 需要能够改变其现有模块的实现，而不破坏集成者。
+
+接下来，让我们逐一探讨 Wormhole 是如何实现这些目标的。
+
+## 去中心化
+
+去中心化是最大的关注点。以前的互操作解决方案大多完全集中，即使是使用诸如敌对中继器之类的新解决方案，仍然倾向于具有单点故障或低至 1 或 2 的勾结阈值。
+
+设计去中心化预言机网络时，首先考虑的选项可能是 Proof-of-Stake (PoS) 系统——但这被证明是次优解。PoS 设计用于智能合约环境中的区块链共识，因此当网络验证许多区块链的输出而不支持自己的智能合约时，它不太适合。尽管从去中心化的角度看起来很吸引人，但网络安全仍不清楚，它可能使实现其他一些目标变得更加困难。让我们探索其他选项。
+
+下一个选项是直接冲向终点，使用零知识证明来保护网络。从去中心化的角度来看，这是一个好的解决方案，因为它实际上是无需信任的。然而，零知识证明仍是一个新兴技术，特别是在计算能力有限的链上验证它们实际上是不可行的。这意味着需要一种多重签名形式来保护网络。
+
+如果我们退一步看当前的 De-Fi 格局，大多数顶级区块链都由同一小部分验证器公司保护。目前，世界上有限的几家公司具备运营一流验证器公司的技能和资本。
+
+如果一个协议能够将大量这样的验证器公司联合到一个为链互操作性优化的特定共识机制中，那么这种设计很可能比通过代币经济模型引导的网络更具性能和安全性。假设验证器们愿意参与，Wormhole 实际上可以利用多少验证器呢？
+
+如果 Wormhole 使用阈值签名，答案基本上是“愿意参与的尽可能多”。然而，阈值签名在区块链世界中的支持不一，这意味着验证签名将是困难且昂贵的，最终限制了可扩展性和链无关性。因此，t-schnorr 多重签名呈现为最佳选项：便宜且支持良好，尽管其验证成本随签名数量线性增加。
+
+综合考虑这些因素，19 似乎是最大数量并且是一个良好的折衷方案。如果需要 2/3 的签名达成共识，则需要在链上验证 13 个签名，从 gas 成本的角度来看这仍然是合理的。
+
+与其通过代币经济学来保护网络，不如先让那些为整个 DeFi 的成功投入大量资金的强大公司参与进来，从而保护网络。这 19 位守护者并非匿名或小公司——他们中的许多人都是加密货币领域中最大、最知名的验证者公司。当前的 Guardian 列表可以在[这里](https://wormhole.com/network/)查看。
 
 
-Wormhole relies upon a set of distributed nodes which monitor state on several blockchains. In Wormhole these nodes are referred to as Guardians. The current guardian set can be seen in the [Wormhole Explorer](https://wormhole.com/network/).
+这就是我们最终拥有 19 个 Guardian 的网络，每个 Guardian 拥有平等的权益，并加入到一个为权威证明共识机制中。随着阈值签名得到更好的支持，Guardian 集合可以扩大，一旦 ZKPs 普及，Guardian 网络将变得完全无需信任。
 
-It is the guardians role to observe messages and sign the corresponding payloads. Each guardian performs this step in isolation, later combining the resulting signatures with other guardians as a final step. The resulting collection of independent observations form a multisig which represents a proof that a state has been observed and agreed upon by a majority of the wormhole network. These multisigs are referred to as VAAs in Wormhole.
+通过我们对去中心化的看法，其余的要素就都明了了。
 
+## 模块化
 
-# Guardian Network
+Guardian 网络本身强大而可信，因此不需要组件如中继器来贡献安全模型。这使 Wormhole 能够拥有简单的组件，它们非常擅长它们所做的事情。这样，Guardians 只需要验证链上活动并产生 VAAs，而 Relayers 只需要与区块链互动并传递消息。
 
-The Guardian Network is designed to serve as Wormhole's oracle component, and the entire Wormhole ecosystem is founded on its technical underpinnings. It is the most critical element of the Wormhole ecosystem, and represents the single most important component to learn about if you want a deep understanding of Wormhole.
+VAAs 的签名方案可以更改，而不影响下游用户，并且可以独立存在多种中继机制。xAssets 可以纯粹在应用层实现，跨链应用可以使用适合它们的任何组件。
 
-To understand not just _how_ the Guardian Network works, but _why_ it works the way it does, let's first take a step back and go over the key design considerations. To become the best-in-class interoperability platform, there were five critical features Wormhole needed to have:
+## 链无关性
 
-1. **Decentralization** - Control of the network needs to be distributed amongst many parties.
-2. **Modularity** - Disparate parts of the ecosystem such as the oracle, relayer, applications, etc, should be kept as separate and modular as possible so they can be designed, modified and upgraded independently.
-3. **Chain Agnosticism** - Wormhole should be able to support not only EVM, but also chains like Solana, Algorand, Cosmos, and even platforms that haven't been created yet. It also should not have any one chain as a single point of failure.
-4. **Scalability** - Wormhole should be able to secure a large amount of value immediately and be able to handle the large transaction volume.
-5. **Upgradeability** - As the decentralized computing ecosystem evolves, Wormhole will need to be able to change the implementation of its existing modules without breaking integrators.
+今天，Wormhole 支持的生态系统范围比任何其他互操作协议都广，因为它使用简单技术（t-schnorr 签名）、一个可适应的、异构的中继器模型和一个强大的验证器网络。
 
-Next, let's go into how Wormhole achieves these one at a time.
+Wormhole 可以像为智能合约运行时开发核心合约一样快速扩展到新的生态系统。中继者不需要被纳入安全模型——他们只需要能够将消息上传到区块链。Guardians 能够观察每条链上的每笔交易，而无需走捷径。
 
-## Decentralization
+## 可扩展性
 
-Decentralization is the biggest concern. Previous interoperability solutions have largely been entirely centralized, and even newer solutions utilizing things like adversarial relayers still tend to have single points of failure or collusion thresholds as low as 1 or 2.
+Wormhole 的可扩展性表现良好，这一点从它在市场动荡时期也能处理巨大的总锁定价值（TVL）和交易量中可以看出
 
-When designing a decentralized oracle network, the first option to consider is likely a Proof-of-Stake (PoS) system-but this turns out to be a suboptimal solution. PoS is designed for blockchain consensus in smart-contract enabled environments, so it's less suitable when the network is verifying the output of many blockchains and not supporting its own smart contracts. While it looks appealing from a decentralization perspective, the network security remains unclear, and it can make some other outlined goals more difficult to achieve. Let's explore other options.
+运行 Guardian 的要求相对较高，因为他们需要为生态系统中的每个单独的区块链运行一个完整节点。这是有限数量的强大验证器公司对此设计有益的另一个原因。
 
-The next option would be to rush straight for the finish line and use zero-knowledge proofs to secure the network. This would be a good solution from a decentralization perspective, as it's literally trustless. However, zero-knowledge proofs are still a nascent technology and it's not really feasible to verify them on-chain, especially on chains with limited computational environments. That means a form of multisig will be needed to secure the network.
+然而，一旦所有的完整节点都在运行，Guardian 网络的实际计算和网络开销就会变得轻量。区块链本身的性能往往是 Wormhole 的瓶颈，而不是 Guardian 网络内部发生的任何事情。
 
-If we step back and look at the current De-Fi landscape, most of the top blockchains are secured by the same handful of validator companies. Currently, there are a limited number of companies in the world with the skills and capital to run top-notch validator companies.
+## 可升级性
 
-If a protocol could unite a large number of those validator companies into a purpose-built consensus mechanism that's optimized for chain interoperability, that design would likely be more performant and secure than a network bootstrapped by a tokenomics model. Assuming the validators would be on board, how many could Wormhole realistically utilize?
-
-If Wormhole were to use threshold signatures, the answer would basically be 'as many as are willing to participate.' However, threshold signatures have spotty support across the blockchain world, meaning it would be difficult and expensive to verify the signatures, ultimately limiting scalability and chain agnosticism. Thus, a t-schnorr multisig presents itself as the best option: cheap and well supported, despite the fact that its verification costs increases linearly with the number of signatures included.
-
-All these things considered, 19 seems to be the maximum number and a good tradeoff. If 2/3 of the signatures are needed for consensus, then 13 signatures need to be verified on-chain, which remains reasonable from a gas-cost perspective.
-
-Rather than securing the network with tokenomics, it is better to initially secure the network by involving robust companies which are heavily invested in the success of De-Fi as a whole. The 19 Guardians are not anonymous or small--they are many of the largest and most widely-known validator companies in cryptocurrency. The current list of Guardians can be viewed [here](https://wormhole.com/network/)
-
-That's how we end up with the network of 19 Guardians, each with an equal stake and joined in a purpose-built Proof of Authority consensus mechanism. As threshold signatures become better supported, the Guardian set can expand, and once ZKPs are ubiquitous, the Guardian Network will become fully trustless.
-
-With our perspective on Decentralization laid out, the remaining elements fall into place.
-
-## Modularity
-
-The Guardian Network is robust and trustworthy by itself, so there's no need for components like the relayer to contribute to the security model. That makes Wormhole able to have simple components that are very good at the one thing they do. That way, Guardians only need to verify on-chain activity and produce VAAs while Relayers only need to interact with blockchains and deliver messages.
-
-The signing scheme of the VAAs can be changed without affecting downstream users, and multiple relay mechanisms can exist independently. xAssets can be implemented purely at the application layer and cross chain applications can use whatever components suits them.
-
-## Chain Agnosticism
-
-Today, Wormhole supports a wider range of ecosystems than any other interoperability protocol because it uses simple tech (t-schnorr signatures), an adaptable, heterogeneous relayer model, and a robust validator network.
-
-Wormhole can expand to new ecosystems as quickly as a Core Contract can be developed for the smart contract runtime. Relayers don't need to be factored into the security model--they just need to be able to upload messages to the blockchain. The Guardians are able to observe every transaction on every chain, without taking shortcuts.
-
-## Scalability
-
-Wormhole scales well, as demonstrated by its ability to handle huge TVL and transaction volume--even during tumultuous events.
-
-The requirements for running a Guardian are relatively heavy, as they need to run a full node for every single blockchain in the ecosystem. This is another reason why a limited number of robust validator companies are beneficial for this design.
-
-However, once all the full nodes are running, the actual computation and network overheads of the Guardian Network become lightweight. The performance of the blockchains themselves tends to be the bottleneck in Wormhole, rather than anything happening inside the Guardian Network.
-
-## Upgradeability
-
-Over time, the Guardian Set can be expanded beyond 19 with the use of threshold signatures. A variety of relaying models will emerge, each with their own strengths and weaknesses. ZKPs can be used on chains where they are well supported. The cross chain application ecosystem will grow, and cross chain applications will become increasingly intermingled with each other. There are very few APIs in Wormhole, and most items are implementation details from the perspective of an integrator. This creates a clear pathway towards a fully trustlessness interoperability layer which spans the entirety of decentralized computing.
+随着时间的推移，Guardian 集合可以通过使用阈值签名扩展到超过 19 个。将出现各种中继模型，每种都有其优点和缺点。ZKPs 可以在它们得到良好支持的链上使用。跨链应用生态系统将增长，跨链应用将与彼此日益交织。Wormhole 中的 API 非常少，大多数项目都是从集成商的角度来看实现细节。这为实现完全无信任的互操作性层创建了一条清晰的道路，该层涵盖了整个去中心化计算。
