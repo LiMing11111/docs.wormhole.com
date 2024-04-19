@@ -1,24 +1,32 @@
+<!--
+ * @Author: “crislee” ‘505267309@qq.com’
+ * @Date: 2024-04-18 18:28:03
+ * @LastEditors: “crislee” ‘505267309@qq.com’
+ * @LastEditTime: 2024-04-19 13:15:21
+ * @FilePath: /docs.wormhole.com/docs/tan-suo-chong-dong-wormhole/spy.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 # Spy
 
 ### Spy
 
-A Spy, in the wormhole context, is a daemon that subscribes to the gossiped messages in the [Guardian Network](guardian.md).
+在 wormhole 上下文中，Spy 是一个守护进程，订阅[守护网络](guardian.md)中的 gossiped 消息。
 
-The messages available on over gossip are things like
+通过 gossiped 可获取的消息包括：
 
 * [VAAs](vaa.md)
-* [Observations](../reference/glossary.md#observation)
-* Guardian Heartbeats
+* [Observation](../reference/glossary.md#observation)
+* Guardian 心跳
 
-The source for the Spy is available on [Github](https://github.com/wormhole-foundation/wormhole/blob/main/node/cmd/spy/spy.go)
+Spy 的源代码可以在 [Github](https://github.com/wormhole-foundation/wormhole/blob/main/node/cmd/spy/spy.go) 上找到。
 
 {% hint style="info" %}
-The Spy has no persistence layer built in, so typically its paired with something like Redis or a SQL database to record relevant messages
+Spy 没有内置持久性层，所以通常与像 Redis 或 SQL 数据库之类的东西配对使用以记录相关消息。
 {% endhint %}
 
 ### Use
 
-To start a Spy locally, run the following docker command.
+要在本地启动一个 Spy ，运行以下的 docker 命令。
 
 {% tabs %}
 {% tab title="Testnet" %}
@@ -31,8 +39,7 @@ docker run --platform=linux/amd64 \
     --spyRPC "[::]:7073" \
     --env testnet
 ```
-
-Optionally, add the flags to skip any VAAs with invalid signatures
+可选地操作，添加 flags 以跳过任何具有无效签名的 VAAs
 
 ```sh
 --ethRPC https://sepolia.drpc.org/
@@ -51,7 +58,7 @@ docker run --platform=linux/amd64 \
     --env mainnet
 ```
 
-Optionally add the flags to skip any VAAs with invalid signatures
+可选地操作，添加 flags 以跳过任何具有无效签名的 VAAs
 
 ```sh
 --ethRPC https://eth.drpc.org
@@ -60,14 +67,14 @@ Optionally add the flags to skip any VAAs with invalid signatures
 {% endtab %}
 {% endtabs %}
 
-Once running, a [gRPC](https://grpc.io/) client (i.e. your program) can subscribe to a filtered stream of messages.
+一旦运行起来一个[ gRPC ](https://grpc.io/)客户端（即你的程序）即可以订阅过滤后的消息流。
 
-To generate a client for the gRPC service use [this proto spec file](https://github.com/wormhole-foundation/wormhole/blob/main/proto/spy/v1/spy.proto).
+为了生成 gRPC 服务的客户端，请使用[此规范的 Spy 文件](https://github.com/wormhole-foundation/wormhole/blob/main/proto/spy/v1/spy.proto)。
 
 {% hint style="info" %}
-If using JavaScript/TypeScript, the [Spydk](https://www.npmjs.com/package/@certusone/wormhole-spydk) makes setting up a client easier.
+如果使用 JavaScript/TypeScript，[Spydk](https://www.npmjs.com/package/@certusone/wormhole-spydk) 可以使设置客户端更容易。
 {% endhint %}
 
-### See Also
+### 另请参阅
 
-The [relayer engine](https://github.com/wormhole-foundation/relayer-engine) implements a client and persistence layer for messages received from a Spy subscription.
+[中继器引擎](https://github.com/wormhole-foundation/relayer-engine)实现了一个客户端和持久层，用于接收来自 Spy 订阅的消息。
