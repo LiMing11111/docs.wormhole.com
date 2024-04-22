@@ -1,124 +1,109 @@
-This documentation provides a comprehensive guide to Relayers within the Wormhole network, describing their role, types, and benefits in facilitating cross-chain processes.
+# Relayers (中继器)
+该文档为 Wormhole 网络中的中继器提供了全面的指南，描述了它们在促进跨链过程中的作用、类型和好处。
+Relayers 在 Wormhole 中是指那些负责将可验证的行动批准 ([VAA](./vaa.md)) 送达目标地。它们在Wormhole的安全模型中扮演关键角色，尽管它们不能影响系统的安全性，但它们的运行状况会影响系统的响应速度（活跃性）。Relayers 作为传递机制，本身并不具备修改 VAAs 结果的能力。
 
-Relayers in the Wormhole context are processes that deliver Verifiable Action Approvals ([VAAs](./vaa.md)) to their destination, playing a crucial role in Wormhole's security model. They can't compromise security, only liveness, and act as delivery mechanisms for VAAs without the capacity to tamper with the outcome.
+主要讨论了三种类型的中继器：
 
-There are three primary types of relayers discussed:
+- [客户端中继](#客户端中继器)：一种经济高效、无需后端基础设施的方法，依赖于面向用户的前端。它提供了一个简单的解决方案，尽管由于涉及手动步骤，它可能会使用户体验复杂化。
+- [专用中继器](#专用中继器)：它们是处理部分跨链流程的后端组件，可提供更流畅的用户体验，并允许进行链下计算以降低 gas 成本。这些中继器可以通过直接监听守护者网络（ Spy 式中继 ）或通过提供 REST 端点来接受要中继的 VAA（ REST 式中继 ）来运行。
+- [标准中继器](#标准中继器)：一种去中心化的中继器网络，可以提供任意 VAA，从而减少开发人员开发、托管或维护中继器的需求。但是，它们要求所有计算都在链上完成，并且可能不太节省 gas。
 
-- [Client-side Relaying](#client-side-relaying): A cost-efficient, no-backend-infrastructure approach relying on user-facing front ends. It provides a simple solution, although it can complicate the user experience due to the manual steps involved.
+## 客户端中继器
 
-- [Specialized Relayers](#specialized-relayers): They are backend components that handle parts of the cross-chain process, offering a smoother user experience and allowing off-chain calculations to reduce gas costs. These relayers could operate through direct listening to the Guardian Network (Spy Relaying) or by providing a REST endpoint to accept VAAs to be relayed (REST Relaying).
+客户端中继依赖于面向用户的前端，如网页或钱包，来完成完整的跨链过程。
 
-- [Standard Relayers](#standard-relayers): A decentralized relayer network that can deliver arbitrary VAAs, reducing the developer's need to develop, host, or maintain relayers. However, they require all calculations to be done on-chain and might be less gas-efficient.
+### 主要特性
 
+1. **成本效益**：用户只需支付第二笔交易的交易费，无需支付任何额外费用。
+2. **无后端基础设施**：该过程完全基于客户端，无需后端中继基础设施。
 
-## Client-side Relaying
+### 实现
+用户自己进行跨链过程的三个步骤：
+1. 对链 A 执行操作。
+2. 从 Guardian Network 检索生成的 VAA。
+3. 使用 VAA 对链 B 执行操作。
 
-Client-side relaying relies on user-facing front ends, such as a webpage or a wallet, to carry out the complete cross-chain process.
+### 注意事项
+{% 提示 style="info" %}
+虽然简单，但如果您的目标是提供高度精致的用户体验，通常不建议使用这种中继方式。不过，对于启动和运行最小可行产品 (MVP) 来说，这种方法很有用。
+{% 结束提示 %}
+- 用户必须使用自己的钱包签署所有必要的交易。
+- 用户必须拥有资金来支付所涉及的每条链的交易费用。
+- 由于涉及手动步骤，用户体验可能会很麻烦。
 
-### Key Features
+## 专用中继器
 
-1. **Cost-Efficiency:** Users only pay for the transaction fee for the second transaction, eliminating any additional costs.
-2. **No Backend Infrastructure:** The process is completely client-based, eliminating the need for a backend relaying infrastructure.
+专门化中继器是Wormhole协议内的定制组件，设计用于为特定应用传递消息。它们能够执行链下计算，并可以根据各种使用情况进行定制。
 
-### Implementation
+### 主要特性
 
-Users themselves carry out the three steps of the cross-chain process:
+1. **优化：** 能够执行不受信任的链下计算，从而优化气体成本。
 
-1. Perform an action on chain A.
-2. Retrieve the resulting VAA from the Guardian Network.
-3. Perform an action on chain B using the VAA.
+2. **可定制性：** 允许采取诸如批处理、条件交付、多链交付等特定策略。
 
+3. **激励结构：** 开发者有自由设计适合其应用程序的激励结构。
 
-### Considerations
+4. **增强用户体验：** 能够代替用户执行跨链过程的第 2 步和第 3 步从而可以简化用户体验。
+
+### 实现
 
 {% hint style="info" %}
-Though simple, this type of relaying is generally not recommended if your aim is a highly-polished user experience. It can, however, be useful for getting a Minimum Viable Product (MVP) up and running.
+为了使专用中继器的开发更加容易，[主 Wormhole 仓库](https://github.com/wormhole-foundation/wormhole/tree/main/relayer)中提供了一个插件中继器。这将建立起基本的中继基础设施，允许开发者专注于实现他们应用程序的特定逻辑。
+
 {% endhint %}
 
-- Users must sign all required transactions with their own wallet.
-- Users must have funds to pay the transaction fees on every chain involved.
-- The user experience may be cumbersome due to the manual steps involved.
+设置专用中继器有两种主要方法：
 
-## Specialized Relayers
+- **Spy 式中继：**通过间谍直接监听 Guardian Network。
 
-Specialized relayers are purpose-built components within the Wormhole protocol, designed to relay messages for specific applications. They are capable of performing off-chain computations and can be customized to suit a variety of use-cases.
+- **REST 式中继：**提供一个 REST 端点来接受应该被转播的 VAA。
 
-### Key Features
-
-1. **Optimization:** Capable of performing untrusted off-chain computations which can optimize gas costs.
-2. **Customizability:** Allows for specific strategies like batching, conditional delivery, multi-chain deliveries, and more.
-3. **Incentive Structure:** Developers have the freedom to design an incentive structure suitable for their application.
-4. **Enhanced UX:** The ability to perform steps 2 and 3 of the cross-chain process on behalf of the user can simplify the user experience.
-
-### Implementation
-
+### 考虑因素
 
 {% hint style="info" %}
-To make the development of specialized relayers easier, a plugin relayer is available in the [main Wormhole repository](https://github.com/wormhole-foundation/wormhole/tree/main/relayer). This sets up the basic infrastructure for relaying, allowing developers to focus on implementing the specific logic for their application.
+请记住，尽管它们的名字是“专用”，但是这些特殊化的中继器仍然被视为不可信任。 VAA是公开的，并且可以由任何人提交，所以开发者不应依赖链下中继器执行任何被认为是“可信”的计算。
+
 {% endhint %}
 
-There are two main methods of setting up a specialized relayer:
+- 需要进行开发工作和托管服务。
+  
+- 费用模型可能会变得复杂，因为负责支付目标链费用的是中继器。
+  
+- 中继器负责活跃性检测，在跨链应用程序上增加了额外依赖项。
 
-- **Spy Relaying:** Involves listening directly to the Guardian Network via a spy.
-- **REST Relaying:** Provides a REST endpoint to accept a VAA that should be relayed.
+## 标准中继器
+标准中继器是 Wormhole 协议中去中心化网络的组成部分，有助于将可验证操作批准 (VAA) 传送给与标准中继器 API 兼容的接收者合约。
 
-### Considerations
+### 主要特征
+1. **降低运营成本**：无需开发、托管或维护单独的中继器。
+2. **简化集成**：由于不需要运行中继器，因此集成就像调用函数和实现接口一样简单。
 
-{% hint style="info" %}
-Remember, despite their name, specialized relayers are still considered untrusted. VAAs are public and can be submitted by anyone, so developers should not rely on off-chain relayers to perform any computation which is considered "trusted".
-{% hint style="info" %}
+### 实现
+标准中继器集成涉及两个关键步骤：
+1. **交付请求**：向 Wormhole 中继生态系统合约请求交付。
+2. **中继接收**：在合约中实现 [receiveWormholeMessages](https://github.com/wormhole-foundation/wormhole-solidity-sdk/blob/bacbe82e6ae3f7f5ec7cdcd7d480f1e528471bbb/src/interfaces/IWormholeReceiver.sol#L44-L50) 函数。VAA 中继成功后将调用此函数。
 
-- Development work and hosting of relayers are required.
-- The fee-modeling can become complex, as relayers are responsible for paying target chain fees.
-- Relayers are responsible for liveness, adding an additional dependency for the cross chain application. 
+### 注意事项
+{% 提示 style="info" %}
+开发人员应注意，中继器的选择取决于项目的具体要求和限制。标准中继器提供了简单性和便利性，但与专用中继器相比，可能会限制定制和优化机会。
+{% 结束提示 %}
+- 所有计算都在链上进行。
+- 与专门的中继器相比，其 gas 效率可能较低。
+- 条件交付、批处理、链下计算等优化功能可能会受到限制。
+- 可能并非所有链都提供支持。
 
+### 基础知识
+本节重点介绍了 Wormhole 网络内中继器运行和处理的关键原则。
+中继器在网络中基本上是不受信任的实体。这意味着，虽然它们不需要您的信任，但不应被完全信任。它们作为传递机制，将可验证操作批准 (VAA) 从其来源传输到其目的地。
 
+VAA 的主要特征包括：
+- 来自守护者网络的公开发布
+- 通过守护者网络的签名进行身份验证
+- 任何实体或任何 Wormhole 核心合约的可验证性
+- 由于这些特点，任何人都可以获取 VAA 并将其传送到任何地方，但没有人可以在不使签名无效的情况下更改 VAA 内容。
 
-## Standard Relayers
+在设计合约时，务必仅信任合约或 VAA 中包含的信息。依赖中继器的信息可能会使您遭受不受信任的输入攻击。
 
-Standard relayers are a component of a decentralized network in the Wormhole protocol, facilitating the delivery of Verifiable Action Approvals (VAAs) to recipient contracts compatible with the standard relayer API.
+高级策略可能涉及让中继器执行不受信任的链下计算，并将其传递到目标合约中。这些策略可以优化 gas 成本，但如果使用不当，也可能产生攻击媒介。
 
-### Key Features
-
-1. **Lower Operational Costs:** No need to develop, host, or maintain individual relayers.
-2. **Simplified Integration:**  Because there is no need to run a relayer, integration is as simple as calling a function and implementing an interface.
-
-### Implementation
-
-The standard relayer integration involves two key steps:
-
-1. **Delivery Request:** Request delivery from the Wormhole Relay Ecosystem Contract.
-2. **Relay Reception:** Implement a [receiveWormholeMessages](https://github.com/wormhole-foundation/wormhole-solidity-sdk/blob/bacbe82e6ae3f7f5ec7cdcd7d480f1e528471bbb/src/interfaces/IWormholeReceiver.sol#L44-L50) function within their contracts. This function is invoked upon successful relay of the VAA.
-
-### Considerations
-
-{% hint style="info" %}
-Developers should note that the choice of relayers depends on the specific requirements and constraints of their project. Standard relayers offer simplicity and convenience but might limit customization and optimization opportunities compared to specialized relayers.
-{% endhint %}
-
-- All computations are performed on-chain.
-- Potentially less gas-efficient compared to specialized relayers.
-- Optimization features like conditional delivery, batching, off-chain calculations might be restricted.
-- Support may not be available for all chains.
-
-
-
-## Fundamentals
-
-
-This section highlights the crucial principles underpinning the operation and handling of relayers within the Wormhole network.
-
-Relayers are fundamentally untrusted entities within the network. This means that while they don't require your trust, they shouldn't be trusted implicitly. They function as delivery mechanisms, transporting Verifiable Action Approvals (VAAs) from their source to their destination.
-
-Key characteristics of VAAs include:
-
-- Public emission from the Guardian Network
-- Authentication through signatures from the Guardian Network
-- Verifiability by any entity or any Wormhole Core Contract
-- As a result of these characteristics, anyone can pick up a VAA and deliver it anywhere, but no one can alter the VAA content without invalidating the signatures.
-
-When designing contracts, it's crucial to only trust information contained within your contract or a VAA. Relying on information from a relayer could expose you to untrusted input attacks.
-
-Advanced strategies can involve having relayers perform untrusted off-chain computation, which is passed into the destination contract. These strategies can optimize gas costs but can also create attack vectors if not used correctly.
-
-In summary, the design of a relayer should ensure there's a single, deterministic way that messages in your protocol can be processed. In an optimally designed protocol, relayers should have a 'correct' implementation, mirroring "crank turner" processes used elsewhere in blockchain.
+总之，中继器的设计应确保有一种单一、确定的方式来处理协议中的消息。在优化设计的协议中，中继器应该有一个“正确”的实现，以反映区块链其他地方使用的“ crank turner ”流程。
