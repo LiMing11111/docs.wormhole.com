@@ -26,7 +26,7 @@
 * [核心合约](tan-suo-chong-dong-wormhole/core-contracts.md)
 * [Guardians](tan-suo-chong-dong-wormhole/guardian.md)
 * [VAAs](tan-suo-chong-dong-wormhole/vaa.md)
-* [Relayers](tan-suo-chong-dong-wormhole/relayer.md)
+* [中继器](tan-suo-chong-dong-wormhole/relayer.md)
 * [Spy](tan-suo-chong-dong-wormhole/spy.md)
 * [Gateway](tan-suo-chong-dong-wormhole/gateway/README.md)
   * [引导](tan-suo-chong-dong-wormhole/gateway/onboard.md)
