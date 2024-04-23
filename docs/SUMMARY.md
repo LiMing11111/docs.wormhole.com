@@ -17,7 +17,7 @@
   * [Simple Relayer](kuai-su-kai-shi/tutorials/relayer/README.md)
     * [Advanced Relayer Example](kuai-su-kai-shi/tutorials/relayer/advanced-example.md)
 * [Demos](kuai-su-kai-shi/demos.md)
-* [Wormhole Connect: Bridging Made Easy](kuai-su-kai-shi/wh-connect.md)
+* [Wormhole Connect: 让桥接变得更容易](kuai-su-kai-shi/wh-connect.md)
 
 ## 探索虫洞（Wormhole）
 
