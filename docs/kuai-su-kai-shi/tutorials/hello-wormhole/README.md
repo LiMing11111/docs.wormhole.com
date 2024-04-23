@@ -1,28 +1,28 @@
 # Hello Wormhole
 
-This tutorial contains a solidity contract (`HelloWormhole.sol`) that can be deployed onto many EVM chains to form a fully functioning cross-chain application.
+本教程包含一个 solidity 合约（`HelloWormhole.sol`），可部署到多个 EVM 链上，形成一个功能完整的跨链应用程序。
 
-Specifically, we will write and deploy a contract onto many chains that allows users to request, from one contract, that a `GreetingReceived` event be emitted from a contracts on a _different chain_.
+具体来说，我们将编写一个合约并将其部署到多个链上，允许用户从一个合约中请求，在不同链上的另一个合约中发出 `GreetingReceived` 事件。
 
-This also allows users to pay for their custom greeting to be emitted on a chain that they do not have any gas funds for!
+用户还可以通过这种方式为自己的定制问候语支付费用，以便在没有任何 gas 费的链上发出问候语！
 
-## Getting Started
+## 入门
 
-Included in the [repository](https://github.com/wormhole-foundation/hello-wormhole) is:
+[源码仓库](https://github.com/wormhole-foundation/hello-wormhole)中包含以下内容：
 
-* Example Solidity Code
-* Example Forge local testing setup
-* Testnet Deploy Scripts
-* Example Testnet testing setup
+* Solidity 代码示例
+* Forge 本地测试配置示例
+* 测试网部署脚本
+* 测试网测试配置示例
 
-### Environment Setup
+### 环境配置
 
-* Node 16.14.1 or later, npm 8.5.0 or later: [https://docs.npmjs.com/downloading-and-installing-node-js-and-npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-* forge 0.2.0 or later: [https://book.getfoundry.sh/getting-started/installation](https://book.getfoundry.sh/getting-started/installation)
+* Node 16.14.1 或更高版本， npm 8.5.0 或更高版本： [https://docs.npmjs.com/downloading-and-installing-node-js-and-npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+* forge 0.2.0 或更高版本：[https://book.getfoundry.sh/getting-started/installation](https://book.getfoundry.sh/getting-started/installation)
 
-### Testing Locally
+### 本地测试
 
-Pull the code down from github and cd into the directory, then build and test it.
+从 github 上下载代码并进入到其目录下，然后构建并测试。
 
 ```bash
 git clone https://github.com/wormhole-foundation/hello-wormhole.git
@@ -31,7 +31,7 @@ npm run build
 forge test
 ```
 
-Expected output is
+预期输出为
 
 ```bash
 Running 1 test for test/HelloWormhole.t.sol:HelloWormholeTest
@@ -39,36 +39,36 @@ Running 1 test for test/HelloWormhole.t.sol:HelloWormholeTest
 Test result: ok. 1 passed; 0 failed; finished in 3.98s
 ```
 
-### Deploying to Testnet
+### 部署到测试网
 
-You will need a wallet with at least 0.05 Testnet AVAX and 0.01 Testnet CELO.
+你将需要一个至少有 0.05 Testnet AVAX 和 0.01 Testnet CELO 的钱包。
 
-* [Obtain testnet AVAX here](https://core.app/tools/testnet-faucet/?token=C)
-* [Obtain testnet CELO here](https://faucet.celo.org/alfajores)
+* [在此获取 testnet AVAX](https://core.app/tools/testnet-faucet/?token=C)
+* [在此获取 testnet CELO](https://faucet.celo.org/alfajores)
 
 ```bash
 EVM_PRIVATE_KEY=your_wallet_private_key npm run deploy
 ```
 
-### Testing on Testnet
+### 在测试网上测试
 
-You will need a wallet with at least 0.02 Testnet AVAX. [Obtain testnet AVAX here](https://core.app/tools/testnet-faucet/?token=C)
+你将需要一个至少有 0.02 Testnet AVAX 的钱包。[在此获取 testnet AVAX](https://core.app/tools/testnet-faucet/?token=C)
 
-You must have also deployed contracts onto testnet (as described in the above section).
+你还必须将合约部署到测试网络上（如上文所述）。
 
-To test sending and receiving a message on testnet, execute the test as such:
+为了测试在测试网上发送和接收信息，请按如下方式执行测试：
 
 ```bash
 EVM_PRIVATE_KEY=your_wallet_private_key npm run test
 ```
 
-## Explanation of the HelloWormhole Cross-chain Contract
+## HelloWormhole 跨链合约说明
 
-Let’s take a simple HelloWorld solidity application, and take it cross-chain!
+让我们以一个简单的 HelloWorld solidity 应用程序为例，并将其实现跨链！
 
-### Single-chain HelloWorld solidity contract
+### 单链 HelloWorld solidity 合约
 
-This single-chain HelloWorld smart contract allows users to send greetings. In other words, it allows them to cause an event `GreetingReceived` to be emitted with their greeting!
+此单链 HelloWorld 智能合约允许用户发送问候语。换句话说，它允许用户在发送问候语时触发 `GreetingReceived` 事件！
 
 ```solidity
 // SPDX-License-Identifier: UNLICENSED
@@ -101,13 +101,13 @@ contract HelloWorld {
 }
 ```
 
-### Taking HelloWorld cross-chain using Wormhole Automatic Relayers
+### 使用 Wormhole Automatic Relayers实现 HelloWorld 跨链传输
 
-Suppose we want users to be able to request, through their Ethereum wallet, that a greeting be sent to Avalanche, and vice versa.
+假设我们希望用户能够通过他们的 Ethereum 钱包请求向 Avalanche 发送问候，反之亦然。
 
-Let us begin writing a contract that we can deploy onto Ethereum, Avalanche, or any number of other chains, to enable greetings be sent freely between each contract, irrespective of chain.
+让我们开始编写一个合约，将其部署到 Ethereum、Avalanche或其他任何链上，使每个合约之间都能自由发送问候，而不受链的限制。
 
-We'll want to implement the following function:
+我们需要执行以下函数：
 
 ```solidity
     /**
@@ -123,7 +123,7 @@ We'll want to implement the following function:
     ) public payable;
 ```
 
-The Wormhole Relayer contract lets us do exactly this! Let’s take a look at the Wormhole Relayer contract interface.
+Wormhole Relayer 合约正是让我们做到了这一点！让我们来看一下 Wormhole Relayer 合约的界面。
 
 ```solidity
     /**
@@ -154,15 +154,15 @@ The Wormhole Relayer contract lets us do exactly this! Let’s take a look at th
     ) external payable returns (uint64 sequence);
 ```
 
-The Wormhole Relayer network is powered by **Delivery Providers**, who perform the service of watching for Wormhole Relayer delivery requests and performing the delivery to the intended target chain as instructed.
+Wormhole Relayer network 由 **Delivery Providers 提供支持，**他们负责监 Wormhole Relayer 的交付请求，并按照指示将其传送到目标链。
 
-In exchange for calling your contract at `targetAddress` on `targetChain` and paying the gas fees that your contract consumes, they charge a source chain fee. The fee charged will depend on the conditions of the target network and the fee can be requested from the delivery provider:
+作为交换，你需要在 `targetChain` 上调用 `targetAddress` 上的合约并支付你的合约所消耗的gas 费，他们会收取源链费用。所收取的费用将取决于目标网络的条件，并且可以向交付提供者请求该费用：
 
 ```
 (deliveryPrice,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)
 ```
 
-So, following this interface, we can implement `sendCrossChainGreeting` by simply calling sendPayloadToEvm with the payload being some information we'd like to send, such as the greeting and the sender of the greeting.
+因此，按照此接口，我们可以通过简单地调用 sendPayloadToEvm 来实现 `sendCrossChainGreeting` ，其中的 payload 是我们想要发送的一些信息，例如问候语和问候语的发送者。
 
 ```solidity
     uint256 constant GAS_LIMIT = 50_000;
@@ -209,9 +209,9 @@ So, following this interface, we can implement `sendCrossChainGreeting` by simpl
 
 ```
 
-A key part of this system, though, is that the contract at the `targetAddress` must implement the `IWormholeReceiver` interface.
+不过，该系统的一个关键部分是 `targetAddress` 的合约必须实现 `IWormholeReceiver` 接口。
 
-Since we want to allow sending and receiving messages by the `HelloWormhole` contract, we must implement this interface.
+由于我们希望通过 `HelloWormhole` 合约发送和接收信息，因此我们必须实现此接口。
 
 ```solidity
 // SPDX-License-Identifier: Apache 2
@@ -261,33 +261,33 @@ interface IWormholeReceiver {
 }
 ```
 
-After `sendPayloadToEvm` is called on the source chain, the off-chain Delivery Provider will pick up the VAA corresponding to the message. It will then call the `receiveWormholeMessages` method on the `targetChain` and `targetAddress` specified.
+在源链上调用 `sendPayloadToEvm` 方法后，链下的 Delivery Provider 将获取与消息对应的 VAA。然后，它将在指定的 `targetChain` 和 `targetAddress` 上调用 `receiveWormholeMessages` 方法。
 
-So, in receiveWormholeMessages, we want to:
+因此，在 receiveWormholeMessages 中，我们要：
 
-1. Update the latest greeting
-2. Emit a 'GreetingReceived' event with the 'greeting' and sender of the greeting
+1. 更新最新的问候语
+2. 发出一个 'GreetingReceived' 事件，其中包含 'greeting' 和问候的发送者
 
-> Note: It is crucial that only the Wormhole Relayer contract can call receiveWormholeMessages
+> 注意：只有 Wormhole Relayer 合约才能调用 receiveWormholeMessages，这一点至关重要。
 
-To provide certainty about the validity of the payload, we must restrict the msg.sender of this function to only be the Wormhole Relayer contract. Otherwise, anyone could call this receiveWormholeMessages endpoint with fake greetings, source chains, and source senders.
+为了确保 payload 的有效性，我们必须将此函数的 msg.sender 限制为仅为 Wormhole Relayer 合约。否则，任何人都可以使用虚假问候语、源链和源发送者调用此 receiveWormholeMessages 端点。
 
-And voila, we have a full contract that can be deployed to many EVM chains, and in totality would form a full cross-chain application powered by Wormhole!
+这样，我们就有了一个完整的合约，它可以部署到许多 EVM 链上，并在 Wormhole 的支持下形成一个完整的跨链应用！
 
-Users with any wallet can request greetings to be emitted on any chain that is part of the system.
+拥有任何钱包的用户都可以请求在系统中的任何一条链上发出问候。
 
-### How does it work?
+### 它是如何工作的？
 
-[Check out Part 2](hello-wormhole-explained.md) for an in-depth explanation of how Wormhole Relayer causes contracts on other blockchains to be called with the appropriate inputs!
+[查看第 2 部分](hello-wormhole-explained.md)深入了解Wormhole Relayer 如何使用适当的输入调用其他区块链上的合约！
 
-### Full Cross-chain HelloWormhole solidity contract
+### 完整的跨链 HelloWormhole solidity 合约
 
-See the [full implementation of the HelloWormhole.sol contract](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/HelloWormhole.sol) and the [full Github repository with testing infrastructure](https://github.com/wormhole-foundation/hello-wormhole/)
+查看 [HelloWormhole.sol 合约的完整实现](https://github.com/wormhole-foundation/hello-wormhole/blob/main/src/HelloWormhole.sol)以及[包含测试基础框架的完整 Github 仓库](https://github.com/wormhole-foundation/hello-wormhole/)
 
 {% hint style="info" %}
-### Wormhole integration complete?
+### Wormhole 集成完成了吗？
 
-Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
+请告诉我们，这样我们就可以将你的项目列入我们的生态目录，并将你介绍给我们的全球多链社区！
 
-[Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
+[立即联系！](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
 {% endhint %}

@@ -1,4 +1,4 @@
-# 专业中继器
+# 专用中继器
 
 ![专业中继器](../../.gitbook/assets/specialized-relayer.png)
 
@@ -46,11 +46,11 @@ messageSequence = wormhole.publishMessage{value: wormholeFee}(
 );
 ```
 
-More details in [Example Source](https://github.com/wormhole-foundation/wormhole-scaffolding/blob/main/evm/src/01\_hello\_world/HelloWorld.sol)
+更多详情请参阅[示例源码](https://github.com/wormhole-foundation/wormhole-scaffolding/blob/main/evm/src/01\_hello\_world/HelloWorld.sol)
 {% endtab %}
 
 {% tab title="Solana" %}
-Using the `wormhole_anchor_sdk::wormhole` module and given the wormhole program account, we can pass a message directly to the core contract.
+使用 `wormhole_anchor_sdk::wormhole` 模块并给定 wormhole 程序账户，我们可以直接向核心合约传递信息。
 
 ```rust
 // ...
@@ -80,25 +80,25 @@ wormhole::post_message(
 // ...
 ```
 
-More details in [Example Source](https://github.com/wormhole-foundation/wormhole-scaffolding/blob/main/solana/programs/01\_hello\_world/src/lib.rs)
+更多详情请参阅[示例源码](https://github.com/wormhole-foundation/wormhole-scaffolding/blob/main/solana/programs/01\_hello\_world/src/lib.rs)
 {% endtab %}
 {% endtabs %}
 
-Once the message is emitted from the core contract, the [Guardian Network](../../tan-suo-chong-dong-wormhole/guardian.md) will observe the message and sign the digest of an Attestation ([VAA](../../tan-suo-chong-dong-wormhole/vaa.md)). We'll discuss this in more depth in the [Off Chain](specialized-relayer.md#off-chain) section below.
+一旦信息从核心合约中发出，[Guardian Network](../../tan-suo-chong-dong-wormhole/guardian.md) 就会发现信息并签署认证摘要（[VAA](../../tan-suo-chong-dong-wormhole/vaa.md)）。我们将在下面的[链下](specialized-relayer.md#off-chain)部分更深入的讨论这一点。
 
 {% hint style="info" %}
-By default, VAAs are [multicast](../../tan-suo-chong-dong-wormhole/core-contracts.md#multicast). This means there is no default **target chain** for a given message. It's up to the application developer to decide on the format of the message and its treatment on receipt.
+默认情况下， VAAs 是 [multicast](../../tan-suo-chong-dong-wormhole/core-contracts.md#multicast)。这意味着给定信息没有默认**目标链**。信息的格式和接收时的处理方式，由应用程序开发人员决定。&#x20;
 {% endhint %}
 
-### Receiving a message
+### 接收信息
 
-The way a message may be received depends on the environment.
+接收信息的方式取决于环境。
 
 {% tabs %}
 {% tab title="EVM" %}
-On EVM chains, the message passed is the raw VAA encoded as binary.
+在 EVM 链上，传递的信息是二进制编码的原始 VAA。
 
-It has _not_ been verified by the core contract and should be treated as untrusted input until `parseAndVerifyVM` has been called.
+核心合约尚未对其进行验证，在调用 `parseAndVerifyVM` 之前，应将其视为不可信任的输入。
 
 ```solidity
 function receiveMessage(bytes memory encodedMessage) public {
@@ -120,7 +120,7 @@ function receiveMessage(bytes memory encodedMessage) public {
 }
 ```
 
-More details in [Example Source](https://github.com/wormhole-foundation/wormhole-scaffolding/blob/main/evm/src/01\_hello\_world/HelloWorld.sol)
+更多详情请参阅[示例源码](https://github.com/wormhole-foundation/wormhole-scaffolding/blob/main/evm/src/01\_hello\_world/HelloWorld.sol)
 {% endtab %}
 
 {% tab title="Solana" %}
@@ -146,43 +146,41 @@ More details in [Example Source](https://github.com/wormhole-foundation/wormhole
 {% endtab %}
 {% endtabs %}
 
-In addition to environment specific checks that should be performed, a contract should take care to check other [fields in the body](../../tan-suo-chong-dong-wormhole/vaa.md#body) such as:
+除了应执行的特定环境检查外，合同还应注意检查[正文](../../tan-suo-chong-dong-wormhole/vaa.md#body)中的其他字段，例如：
 
-* **Emitter**: Is this coming from an emitter address and chain id I expect? Typically contracts will provide a method to register a new emitter and check the incoming message against the set of emitters it trusts.
-* **Sequence**: Is this the sequence number I expect? How should I handle out of order deliveries?
-* **Consistency Level**: For the chain this message came from, is the [consistency level](../../tan-suo-chong-dong-wormhole/core-contracts.md#consistencylevel) enough to guarantee the transaction wont be reverted after I take some action?
+* **Emitter：**这是否来自我期望的 emitter 地址和链 id？通常，合约将提供一种方法来注册新的 emitter 并根据其信任的 emitter 集检查传入的消息。
+* 序列：这是我期望的序列号吗？我应该如何处理无序交付？
+* **Consistency Level**：对于这条信息来自的链，[consistency level](../../tan-suo-chong-dong-wormhole/core-contracts.md#consistencylevel) 是否足以保证我采取某些操作后交付不会被撤销？
 
-Outside of body of the VAA, but also relevant, is the digest of the VAA which can be used for replay protection by checking if the digest has already been seen.
+VAA 主体之外但也与之相关的是 VAA 的摘要，通过检查摘要是否已经被看到，可以将其用于重放保护。
 
-Since the payload itself is application specific, there may be other elements to check to ensure safety.
+由于 payload 本身是特定于应用程序的，因此可能还有其他因素需要检查以确保安全。
 
-## Off Chain
+## 链下
 
-In order to shuttle messages between chains, some [off chain processes](../../tan-suo-chong-dong-wormhole/components.md#off-chain-components) are involved. The [Guardians](../../tan-suo-chong-dong-wormhole/guardian.md) observe the events from the core contract and sign a [VAA](../../tan-suo-chong-dong-wormhole/vaa.md).
+为了在链之间传递信息，需要一些[链下进程](../../tan-suo-chong-dong-wormhole/components.md#off-chain-components)。[Guardians](../../tan-suo-chong-dong-wormhole/guardian.md) 观察核心合约中发生的事件并签署 [VAA](../../tan-suo-chong-dong-wormhole/vaa.md)。
 
-After enough Guardians have signed the message (at least `2/3 + 1` or 13 of 19 guardians), the VAA is available to be delivered to a target chain.
+在足够多的 Guardians 签署信息后（至少 `2/3 + 1` 或 13 / 19 个 guardians），VAA 就可以被传递到目标链。is available to be
 
-Once the VAA is available, a [Relayer](../../tan-suo-chong-dong-wormhole/relayer.md) may deliver it in a properly formatted transaction to the target chain.
+一旦 VAA 可用，[中继器](../../tan-suo-chong-dong-wormhole/relayer.md)就可以通过格式正确的交易将其传送到目标链。
 
-### Specialized Relayer
+需要中继器将包含信息的 VAA 传递到目标链。当中继器专门为自定义应用程序编写时，则被称为专用中继器[专用中继器](specialized-relayer.md)
 
-A relayer is needed to deliver the VAA containing the message to the target chain. When the relayer is written specifically for a custom application, it's referred to as a [Specialized Relayer](specialized-relayer.md)
+专门的中继器可以是一个简单的浏览器进程，它在提交交易后轮询 [API](../../reference/api-docs/) 以获取 VAA 的可用性，并将其传递到目标链。也可以使用 [Spy](../../tan-suo-chong-dong-wormhole/spy.md) 和一些守护进程来实现，这些守护进程会监听相关 `chainID` 和 `emitter` 的VAAs，一旦检测到这样的信息，就会采取相应的行动。
 
-A specialized relayer might be as simple as an in browser process that polls the [API](../../reference/api-docs/) for the availability of a VAA after submitting a transaction and delivers it to the target chain. It might also be implemented with a [Spy](../../tan-suo-chong-dong-wormhole/spy.md) coupled with some daemon listening for VAAs from a relevant `chainID` and `emitter` then taking action when one is observed.
+#### 简易中继器
 
-#### Simple Relayer
+无论环境如何，为了获得我们想要中继的 VAA，我们需要：
 
-Regardless of the environment, in order to get the VAA we intend to relay, we need:
+1. `emitter` 地址
+2. 我们感兴趣的消息的 `sequence` id
+3. 发出信息的链的 `chainId`
 
-1. The `emitter` address
-2. The `sequence` id of the message we're interested in
-3. The `chainId` for the chain that emitted the message
+有了这三个组件，我们就能唯一识别 VAA 并从 [API](../../reference/api-docs/) 中获取它。
 
-With these three components, we're able to uniquely identify a VAA and fetch it from the [API](../../reference/api-docs/).
+**获取 VAA**
 
-**Fetching the VAA**
-
-Using the `getSignedVAAWithRetry` function provided in the [SDK](../../reference/sdk-docs/), we're able to poll the Guardian RPC until the signed VAA is ready.
+使用 [SDK](../../reference/sdk-docs/) 中提供的 `getSignedVAAWithRetry` 函数，我们可以轮询 Guardian RPC 直到签名的 VAA 准备就绪。
 
 ```ts
 import { 
@@ -210,11 +208,11 @@ async function getVAA(emitter: string, sequence: string, chainId: number): Promi
 const vaaBytes = await getVAA('0xdeadbeef', 1, CHAIN_ID_ETH);
 ```
 
-Once we have the VAA, the delivery method is chain dependent.
+一旦我们获得了 VAA，交付方式就取决于链。
 
 {% tabs %}
 {% tab title="EVM" %}
-On EVM chains, the bytes for the VAA can be passed directly as an argument to an ABI method.
+在 EVM 链上，VAA 的字节可以直接作为参数传递给 ABI 方法。
 
 ```ts
 // setup eth wallet
@@ -291,8 +289,8 @@ await connection.confirmTransaction(txid);
 {% endtab %}
 {% endtabs %}
 
-See the [Specialized Relayer Tutorial](../../tutorials/app-integration/specialized-relayer.md) for a detailed walkthrough.
+参阅[专用中继器教程](../../tutorials/app-integration/specialized-relayer.md)以获取详细的演示。
 
-## Reference
+## 参考
 
-Read more about the architecture and core components [here](../../tan-suo-chong-dong-wormhole/components.md)
+点击[这里](../../tan-suo-chong-dong-wormhole/components.md)了解更多有关架构和核心组件的信息

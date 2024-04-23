@@ -1,10 +1,10 @@
-# Tutorials
+# 教程
 
 1. [Hello Wormhole](hello-wormhole/)
-   * Details a minimal example of message passing using the Standard Relayer
+   * 详细介绍使用标准中继器传递信息的最小示例
 2. [Hello Token](hello-token.md)
-   * Details a minimal example of token transfer using the Standard Relayer
+   * 详细介绍使用标准中继器进行 token 传输的最小示例
 
 {% hint style="info" %}
-More tutorials are in progress. If there is one you'd like to see, feel free to file an [issue on the docs repository](https://github.com/wormhole-foundation/docs.wormhole.com)
+更多教程正在编写中。如果你有需要，请随时在[文档库中提交问题](https://github.com/wormhole-foundation/docs.wormhole.com)
 {% endhint %}

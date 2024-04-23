@@ -1,10 +1,10 @@
-# Hello Wormhole Explained
+# 解释 Hello Wormhole
 
-In Part 1 ([HelloWormhole](./)), we wrote a fully functioning cross-chain application that allows users to request, from one contract, that a `GreetingReceived` event to be emitted from one of the other contracts on a different chain.
+在第 1 部分（ [HelloWormhole](./)）中，我们编写了一个功能完整的跨链应用程序， 允许用户从一个合约中请求，在不同链上的另一个合约中发出 `GreetingReceived` 事件。
 
-To do this, we made use of the **Wormhole Relayer** contract ([full interface](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol), [implementation](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/relayer/wormholeRelayer/WormholeRelayer.sol)).
+为此，我们使用了 **Wormhole Relayer** 合约（[完整接口](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol)，[实现方式](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/relayer/wormholeRelayer/WormholeRelayer.sol)）。
 
-Specifically we used the following functions:
+具体来说，我们使用了以下函数：
 
 ```solidity
 
@@ -23,7 +23,7 @@ Specifically we used the following functions:
     ) external view returns (uint256 nativePriceQuote, uint256);
 ```
 
-This **Wormhole Relayer** contract is deployed on both Mainnet and Testnets.
+该 **Wormhole Relayer** 合约同事部署在 Mainnet 和 Testnets 上。
 
 ### Testnet
 
@@ -35,9 +35,9 @@ This **Wormhole Relayer** contract is deployed on both Mainnet and Testnets.
 
 ### Mainnet
 
-For all Mainnet deployments, the contract has the same address: `0x27428DD2d3DD32A4D7f7C497eAaa23130d894911`
+在所有 Mainnet 部署中，合同都有相同的地址：`0x27428DD2d3DD32A4D7f7C497eAaa23130d894911`
 
-It is currently deployed to:
+它目前部署在：
 
 * Chain ID 2: Ethereum
 * Chain ID 4: Binance Smart Chain
@@ -50,92 +50,92 @@ It is currently deployed to:
 * Chain ID 23: Arbitrum
 * Chain ID 24: Optimism
 
-> Note: the `targetChain` input should be the number in front of your desired chain; e.g. 2 for Ethereum, 4 for Binance Smart Chain, 6 for Avalanche, etc...
+> 注意：输入的 `targetChain` 应为你所需链前面的数字；例如 2 代表 Ethereum， 4 代表 Binance Smart Chain， 6 代表 Avalanche，等等...
 
-So for any of these chains, the `sendPayloadToEvm` of the deployed contract may be called.
+因此对于任何这些链，都可以调用已部署合约的 `sendPayloadToEvm`。
 
-> Note: The method `sendPayloadToEvm` must be called with a specific `msg.value`, specifically `(uint256 requiredMsgValue,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)`
+> 注意：必须使用特定 `msg.value` 调用 `sendPayloadToEvm` 方法，具体为 `(uint256 requiredMsgValue,) = quoteEVMDeliveryPrice(targetChain, receiverValue, gasLimit)`
 
-Calling this function will result in the **receiveWormholeMessages** endpoint on address ‘targetAddress’ on chain ‘targetChain’ to be invoked with a gas limit of ‘gasLimit’ and msg.value of ‘receiverValue’, and with the payload parameter being ‘payload’.
+调用此函数将导致在链 'targetChain' 上的地址 'targetAddress' 上的 **receiveWormholeMessages** 端点被调用，调用的 gas 限制为 'gasLimit'，msg.value 为 'receiverValue'，并且 payload 参数为 'payload'。&#x20;
 
-## How does the Wormhole Relayer contract cause a function call on a different blockchain?
+## Wormhole Relayer 合约如何在不同的区块链上进行函数调用？
 
-### Step 1
+### 步骤 1
 
-**The Wormhole Relayer contract publishes the Delivery Instructions and pays the Delivery Provider**
+**Wormhole Relayer 合约发布 Delivery Instructions 并向支付 Delivery Provider**
 
-The method `sendPayloadToEvm` works by publishing a wormhole message (simply an event containing bytes) with instructions for how to perform the delivery: the target chain, target address, receiver value, gas limit, payload, and any other necessary information
+`sendPayloadToEvm` 方法的工作原理是发布一条 wormhole 信息（只是一个包含字节的事件），其中包含有关如何执行交付的说明：目标链、目标地址、接收者值、gas limit、payload 及任何其他必要信息
 
-`sendPayloadToEvm` also then **pays a delivery provider** it's `msg.value`.
+`sendPayloadToEvm` 还会向 **delivery provider** 支付其 `msg.value`。
 
-Delivery Providers are permissionless entities that help power the Wormhole Relayer network. If left unspecified, your delivery request will be assigned to the default delivery provider. Each delivery provider is allowed to set it's own pricing for relaying to a specific chain with a specific receiverValue and gasLimit.
+Delivery Providers 是无需许可的实体，可帮助支持 Wormhole Relayer 网络。如果未指定，你的支付请求将被分配给默认 delivery provider。每个 delivery provider 都可以为中继到具有特定 receiverValue 和 gasLimit 的特定链设定自己的定价。
 
-The [full Wormhole Relayer interface](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol) provides endpoints where you can specify the delivery provider you wish to use
+[完整的 Wormhole Relayer 接口](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol)提供了端点，你可以在其中指定要使用的  delivery provider
 
-> **In our scenario,**
+> **在我们的方案中，**
 >
-> * a user of HelloWormhole calls ‘sendCrossChainGreeting’,
-> * which calls the Wormhole Relayer contract’s ‘sendPayloadToEvm’,
-> * which publishes the delivery instructions to the blockchain logs and pays the default delivery provider
+> * HelloWormhole 的用户调用 ‘sendCrossChainGreeting’，
+> * 这将是调用 Wormhole Relayer 合约的 ‘sendPayloadToEvm’，
+> * 将交付指令发布到区块链日志并向默认 delivery provider 支付
 
-### Step 2
+### 步骤 2
 
-**The Guardians create a signed VAA**
+**Guardians 创建已签名的 VAA**
 
-The wormhole protocol, at it’s core, is publishing messages from blockchains that are then signed by a quorum of 19 entities called the [Guardians](https://docs.wormhole.com/wormhole/explore-wormhole/guardian) to form signed VAAs.
+wormhole 协议的核心是发布区块链上的信息，然后由称为 [Guardians](https://docs.wormhole.com/wormhole/explore-wormhole/guardian) 的19个实体组成的的法定人数进行签名，形成已签名的 VAAs。
 
-Each Guardian watches the wormhole-connected blockchains and signs Wormhole events it sees, forming a VAA, the [core primitive of wormhole](https://docs.wormhole.com/wormhole/explore-wormhole/vaa). Once a VAA obtains 13 of 19 signatures, it is considered fully signed.
+每个 Guardian 都会监控 wormhole 连接的区块链，并在看到的 Wormhole 事件上签名，从而形 [wormhole 的核心基元 ](https://docs.wormhole.com/wormhole/explore-wormhole/vaa)VAA。一旦 VAA 获得 19 个签名中的 13 个，它就被视为完全签名。
 
-> **In our scenario,** 13 of 19 guardians sign the delivery instructions to form a signed VAA
+> 在我们的方案中，19 位 guardians 中有 13 位在交付说明上签名，以形成一份已签名的 VAA
 
-### Step 3
+### 步骤 3
 
-**The Delivery Provider watches for signed VAAs containing deliveries that it has been assigned to, and (off chain!) parses the delivery instructions**
+**Delivery Provider 监控已签名的 VAAs，其中包含它已被分配的交付内容，并解析交付指令（链下！）**
 
-The Delivery Provider is likely running some form of the [Relayer Engine](https://github.com/wormhole-foundation/relayer-engine), watching the guardian network for signed VAAs containing wormhole messages from the Wormhole Relayer contract that indicate delivery instructions for them to execute on.
+Delivery Provider 很可能正在运行某种形式的 [Relayer Engine](https://github.com/wormhole-foundation/relayer-engine)，监控着 guardian 网络中的已签名的 VAAs，其中包含来自Wormhole Relayer 合约的 wormhole 信息，这些消息指示他们需要执行的交付指令。
 
-> The delivery instructions can even indicate fetching other VAAs ([see the sendVaasToEvm endpoint](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol#L119)!) This feature is useful for composing with other Wormhole protocols, such as TokenBridge
+> 交付指令甚至可以指示获取其他 VAAs（ [请参阅 sendVaasToEvm 端点](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol#L119)！）， 此功能对于其他 Wormhole 协议，例如 TokenBridge 组合非常有用
 
-The Delivery Provider parses the delivery instruction it sees and obtains the following information:
+Delivery Provider 解析看到的传递指令，并获取以下信息：
 
-* The full signed VAA containing the delivery instructions (that it parsed)
-* Any additional VAAs that were requested to be delivered
-* The target chain
-* The cost of the delivery (the msg.value it needs to provide, as well as the maximum possible refund it could need to pay)
+* 完整签名的 VAA， 其中包含交付说明（以解析）
+* 要求交付的任何其他 VAAs
+* 目标链
+* 交付成本（需要提供 msg.value 以及可能需要支付的最大退款金额）
 
-and then calls the `deliver` endpoint on the Wormhole Relayer contract on the target chain with the signed delivery instructions VAA and additional VAAs (and msg.value) as input.
+然后，使用已签名的交付指令 VAA 和 额外的 VAAs（以及 msg.value）作为输入，调用目标链上 Wormhole Relayer 合约的 `deliver` 端点。
 
-> **In our scenario,**
+> **在我们的方案中，**
 >
-> * The default delivery provider sees the delivery instructions VAA,
-> * parses the VAA off-chain to figure out the correct target chain
-> * and submits the VAA to the ‘deliver’ endpoint on the Wormhole Relayer contract on the target chain
+> * 默认 delivery provider 查看交付说明 VAA，&#x20;
+> * 解析链下的 VAA 以找出正确的目标链
+> * 并将 VAA 提交给目标链上的 Wormhole Relayer 合约的 ‘deliver’ 端点
 
-### Step 4
+### 步骤 4
 
-**The Wormhole Relayer contract receives the delivery VAA, ensures the guardian signatures are valid, and calls the `receiveWormholeMessages` endpoint**
+**Wormhole Relayer 合约接收交付的 VAA，确保 guardian 签名有效，并调用 `receiveWormholeMessages` 端点**
 
-The `deliver` endpoint on the Wormhole Relayer contract, when called by the delivery provider:
+当 delivery provide 调用 Wormhole Relayer 合约上的交付端点时：&#x20;
 
-* ensures the signatures of the delivery VAA are valid
-* parses the delivery instructions to figure out the targetAddress, payload, gasLimit, receiverValue, etc
-* **calls the ‘receiveWormholeMessages()’ endpoint of ‘targetAddress’** with the payload, as well as additional metadata (e.g. additional VAAs, the source chain, source address, hash of the delivery VAA which can be used as a unique identifier), and with the specified gasLimit and msg.value (receiverValue)
+* 确保交付 VAA 的签名有效
+* 解析交付指令，找出targetAddress、payload、gasLimit、receiverValue，等
+* **调用 'targetAddress' 的 'receiveWormholeMessages()' 端点**，并传入 payload，额外的数据源（例如额外的 VAAs、源链、源地址、交付 VAA 的哈希，可以用作唯一标识符），以及指定的 gasLimit 和 msg.value（receiverValue）。&#x20;
 
-A status event is then emitted to indicate whether this call succeeded or failed (and if it failed, the revert string is provided).
+然后发出一个状态事件来指示此调用是否成功或失败（如果失败，则提供恢复字符串）。
 
-> To see the status of your delivery requests, use the ‘getWormholeRelayerInfo’ function in the Wormhole Javascript SDK - [see usage here](https://github.com/wormhole-foundation/hello-wormhole/blob/main/ts-scripts/getStatus.ts). You can run this in HelloWormhole using `npm run status -- --tx TRANSACTION_HASH`
+> 要查看交付请求的状态，请使用 Wormhole Javascript SDK  中的 'getWormholeRelayerInfo' 函数——[请参见此处的方法](https://github.com/wormhole-foundation/hello-wormhole/blob/main/ts-scripts/getStatus.ts)。你可以在 HelloWormhole 中运行以下命令： `npm run status -- --tx TRANSACTION_HASH`
 
-> **In our scenario, (on the target chain)**
+> **在我们的方案中红，（在目标链上）**
 >
-> * The Wormhole Relayer contract verifies the signatures on the delivery VAA,
-> * and then parses the VAA to figure out the correct target address (which is our HelloWormhole contract on this chain), payload, and gas limit
-> * and submits the payload to the ‘receiveWormholeMessages’ endpoint of our HelloWormhole contract
-> * ..and then our HelloWormhole contract on the target chain does the rest!
+> * Wormhole Relayer 合约会验证交付 VAA 上的签名，
+> * 然后解析 VAA，找出正确的目标地址（也就是我们在这条链上的 HelloWormhole 合约 ）、payload 和 gas limit
+> * 并将 payload 提交给我们的 HelloWormhole 合约的 ‘receiveWormholeMessages’ 端点
+> * ....然后我们在目标链上的 HelloWormhole 合约就完成了其余的工作！
 
 {% hint style="info" %}
-### Wormhole integration complete?
+### Wormhole 集合完成了吗？
 
-Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
+请告诉我们，这样我们就可以将你的项目列入我们的生态目录，并将你介绍给我们的全球多链社区！
 
-[Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
+[立即联系！](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
 {% endhint %}

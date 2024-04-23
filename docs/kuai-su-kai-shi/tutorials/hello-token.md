@@ -1,26 +1,26 @@
 # Hello Token
 
-This tutorial contains a [solidity contract](https://github.com/wormhole-foundation/hello-token/blob/main/src/HelloToken.sol) that can be deployed onto many EVM chains to form a fully functioning cross-chain application with the ability for users to request, from one contract, that tokens are sent to an address on a different chain.
+本教程包含一个 [solidity 合约](https://github.com/wormhole-foundation/hello-token/blob/main/src/HelloToken.sol)，它可以部署到许多 EVM 链上，形成一个功能完整的跨链应用程序，用户可以通过一个合约请求将 tokens 发送到不同链上的地址。
 
-Here is an example of a [cross-chain borrow lending application](https://github.com/wormhole-foundation/cross-chain-borrow-lend) that uses the topics covered in this tutorial!
+下面是一个[跨链借贷应用](https://github.com/wormhole-foundation/cross-chain-borrow-lend)的示例，其中使用了本教程中涉及的主题！
 
-## Summary
+## 概要
 
-Included in this [repository](https://github.com/wormhole-foundation/hello-token/) is:
+此[仓库](https://github.com/wormhole-foundation/hello-token/)包含以下内容：
 
-* Example Solidity Code
-* Example Forge local testing setup
-* Testnet Deploy Scripts
-* Example Testnet testing setup
+* Solidity 代码示例
+* Forge 本地测试配置示例
+* Testnet 部署脚本
+* Testnet 测试配置示例
 
-### Environment Setup
+### 环境配置
 
-* Node 16.14.1 or later, npm 8.5.0 or later: [https://docs.npmjs.com/downloading-and-installing-node-js-and-npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-* forge 0.2.0 or later: [https://book.getfoundry.sh/getting-started/installation](https://book.getfoundry.sh/getting-started/installation)
+* Node 16.14.1 或更高版本，npm 8.5.0 或更高版本： [https://docs.npmjs.com/downloading-and-installing-node-js-and-npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+* forge 0.2.0 或更高版本：[https://book.getfoundry.sh/getting-started/installation](https://book.getfoundry.sh/getting-started/installation)
 
-### Testing Locally
+### 本地测试
 
-Clone down the repo, cd into it, then build and run unit tests:
+克隆该仓库，并进入，然后构建并运行单元测试：
 
 ```bash
 git clone https://github.com/wormhole-foundation/hello-token.git
@@ -29,7 +29,7 @@ npm run build
 forge test
 ```
 
-Expected output is
+预期输出为
 
 ```bash
 Running 1 test for test/HelloToken.t.sol:HelloTokenTest
@@ -37,54 +37,54 @@ Running 1 test for test/HelloToken.t.sol:HelloTokenTest
 Test result: ok. 1 passed; 0 failed; finished in 5.64s
 ```
 
-### Deploying to Testnet
+### 部署到 Testnet
 
-You will need a wallet with at least 0.05 Testnet AVAX and 0.01 Testnet CELO.
+你将需要一个至少有 0.05 Testnet AVAX 和 0.01 Testnet CELO 的钱包。
 
-* [Obtain testnet AVAX here](https://core.app/tools/testnet-faucet/?token=C)
-* [Obtain testnet CELO here](https://faucet.celo.org/alfajores)
+* [在此处获取 testnet AVAX](https://core.app/tools/testnet-faucet/?token=C)
+* [在此处获取 testnet CELO](https://faucet.celo.org/alfajores)
 
 ```bash
 EVM_PRIVATE_KEY=your_wallet_private_key npm run deploy
 ```
 
-### Testing on Testnet
+### 在 Testnet 上测试
 
-You will need a wallet with at least 0.02 Testnet AVAX. [Obtain testnet AVAX here](https://core.app/tools/testnet-faucet/?token=C)
+你将需要一个至少有 0.02 Testnet AVAX 的钱包。[在此处获取 testnet AVAX](https://core.app/tools/testnet-faucet/?token=C)
 
-You must have also deployed contracts onto testnet (as described in the above section).
+你还必须将合约部署到 testnet 上（如上节所述）。
 
-To test sending and receiving a message on testnet, execute the test as such:
+要测试在 testnet 上发送和接收信息，请按如下方式执行测试：
 
 ```bash
 EVM_PRIVATE_KEY=your_wallet_private_key npm run test
 ```
 
-## Getting Started
+## 入门
 
-Let's write a [HelloToken contract](https://github.com/wormhole-foundation/hello-token/blob/main/src/HelloToken.sol) that lets users send an arbitrary amount of an IERC20 token to an address of their choosing on another chain.
+让我们编写一个 [HelloToken 合约](https://github.com/wormhole-foundation/hello-token/blob/main/src/HelloToken.sol)，让用户可以将任意数量的 IERC20 token 发送到他们在另一条链上选择的地址。
 
-### Valid Tokens
+### 有效 Tokens
 
-Before getting started, it is important to note that we use Wormhole's **TokenBridge** to transfer tokens between chains!
+在开始之前，需要注意的是，我们使用 Wormhole 的 **TokenBridge** 在链之间传输 tokens！
 
-So, in order to send a token using the method in this example, the token must be attested onto the Token Bridge contract that lives on our desired target blockchain.
+因此，要使用本例中的方法发送 token，必须将 token 认证到我们期望的目标区块链上的 Token Bridge 合约上。
 
-In the test above, when you run `npm run deploy`, a mock token contract was both deployed and attested onto the target chain's Token Bridge contract.
+在上面的测试中，当你运行 `npm run deploy` 时， 一个模拟 token 合约被部署并认证到目标链的 Token Bridge 合约上。
 
-If you wish to attest a token yourself for the TokenBridge, you may use the [attestWorkflow](https://github.com/wormhole-foundation/hello-token/blob/main/ts-scripts/deploy-mock-tokens.ts#L52) function.
+如果你希望自己为 TokenBridge 认证 token，你可以使用 [attestWorkflow](https://github.com/wormhole-foundation/hello-token/blob/main/ts-scripts/deploy-mock-tokens.ts#L52) 函数。
 
-To check if a token already is attested onto a TokenBridge, call the `wrappedAsset(uint16 tokenChainId, bytes32 tokenAddress)` function on the TokenBridge - this will return, if attested, the address of the wrapped token on this blockchain corresponding to the given token (from the source blockchain), and the 0 address if the input token hasn't been attested yet.
+要检查 token 是否已被认证到 TokenBridge 上，可调用 TokenBridge 上的 `wrappedAsset(uint16 tokenChainId, bytes32 tokenAddress)` 函数，如果已被认证，则将返回此区块链上与给定 token（来自源区块链）相对应的 wrapped token 的地址，如果输入 token 尚未认证，则返回 0 地址。
 
 <details>
 
-<summary>How attestWorkflow works</summary>
+<summary>attestWorkflow 的工作原理</summary>
 
-The 'attestWorkflow' function does the following:
+The 'attestWorkflow' 函数的功能如下：
 
-1.  On the Source side: Calls the TokenBridge `attestToken` function with the token we're trying to send.
+1.  在 Source 端: 使用我们要尝试发送的 token 调用 TokenBridge `attestToken` 函数。
 
-    > This creates a payload containing the token details so that it may be created on the receiving side
+    > 这将创建一个包含 token 详细信息的 payload，以便在接收端创建 token
 2.  Off chain: [Fetch the VAA](https://docs.wormhole.com/wormhole/reference/api-docs/swagger#v1-signed\_vaa-chain\_id-emitter-seq) using the Wormhole Chain ID, Emitter address (TokenBridge address) and sequence number from the `LogMessage` event.
 
     > This is the VAA that contains the token details with signatures from the Guardians
@@ -98,25 +98,25 @@ Once this is done, the TokenBridge on the receiving side can successfully mint t
 
 ### Wormhole Solidity SDK
 
-To ease development, we'll make use of the [Wormhole Solidity SDK](https://github.com/wormhole-foundation/wormhole-solidity-sdk).
+为了便于开发，我们将使用 [Wormhole Solidity SDK](https://github.com/wormhole-foundation/wormhole-solidity-sdk)。
 
-Include this SDK in your own cross-chain application by running:
+在你自己的跨链应用程序中运行该 SDK：
 
 ```bash
 forge install wormhole-foundation/wormhole-solidity-sdk
 ```
 
-and import it in your contract:
+并将其导入到你的合约中：
 
 ```solidity
 import "wormhole-solidity-sdk/WormholeRelayerSDK.sol";
 ```
 
-This SDK provides helpers that make cross-chain development with Wormhole easier, and specifically provides us with the TokenSender and TokenReceiver abstract classes with useful functionality for sending and receiving tokens using TokenBridge
+该 SDK 提供了帮助工具，使 Wormhole 的跨链开发变得更容易，特别是为我们提供了 TokenSender 和 TokenReceiver 抽象类，它们具有使用 TokenBridge 发送和接收 tokens 的有用功能。
 
-### Implement Sending Function
+### 实现发送功能
 
-Lets start by writing a function to send some amount of a token to a specific recipient on a target chain.
+让我们首先编写一个函数，将一定数量的 token 发送给目标链上的特定接收者。
 
 ```solidity
 function sendCrossChainDeposit(
@@ -128,16 +128,16 @@ function sendCrossChainDeposit(
 ) public payable;
 ```
 
-The body of this function will send the token as well as a payload to the HelloToken contract on the target chain. For our application, the payload will contain the intended recipient of the token, so that the target chain HelloToken contract can send the token to the intended recipient.
+该函数的主体将向目标链上的 HelloToken 合约发送 token 和 payload 。对于我们的应用程序来说，payload 将包含 token 的预期接收者，这样目标链上的 HelloToken 合约就能把 token 发送给预期接收者。
 
-> Note: TokenBridge only supports sending IERC20 tokens, and specifically only up to 8 decimals of a token. So, if your IERC20 token has 18 decimals, and you send `amount` of a token, you will receive `amount` rounded down to the nearest multiple of 10^10.
+> 注意：TokenBridge 只支持发送 IERC20 tokens，具体而言只支持最多 8 位小数的 token。因此，如果你的 IERC20 token 有 18 位小数，并且你发送的是一个 token 的 `amount`，那么你将收到四舍五入到最接近的 10^10 倍的 `amount`。
 
-To send the token and payload to the HelloToken contract, we make use of the `sendTokenWithPayloadToEvm` helper from the Wormhole Solidity SDK.
+为了向 HelloToken 合约发送 token 和 payload，我们使用了 Wormhole Solidity SDK 的 `sendTokenWithPayloadToEvm` 帮助工具。
 
-For a successful transfer, several things need to happen:
+想要成功传送，需要做到以下几点：
 
-* The user (or contract) who calls `sendCrossChainDeposit` should **approve** the `HelloToken` contract to use `amount` of the user's tokens. See how that is done in the forge test [here](https://github.com/wormhole-foundation/hello-token/blob/main/test/HelloToken.t.sol#L37)
-* We must transfer `amount` of the token from the user to the `HelloToken` source contract `IERC20(token).transferFrom(msg.sender, address(this), amount);`
+* 调用 `sendCrossChainDeposit` 的用户（或合约）应**批准** `HelloToken` 合约使用用户 tokens 的 `amount`。在[此处](https://github.com/wormhole-foundation/hello-token/blob/main/test/HelloToken.t.sol#L37)查看如何在 forge 测试中完成此操作。
+* 我们必须将用户的 token 中的 `amount` 转移到 `HelloToken` 源合约中`IERC20(token).transferFrom(msg.sender, address(this), amount);`
 * We must encode the recipient address into a payload `bytes memory payload = abi.encode(recipient);`
 * We must ensure the correct amount of `msg.value` was passed in to send the token and payload.
   * The cost to send a token is provided by the value returned by `wormhole.messageFee()` Currently this is 0 but _may_ change in the future, so don't assume it will always be 0.
