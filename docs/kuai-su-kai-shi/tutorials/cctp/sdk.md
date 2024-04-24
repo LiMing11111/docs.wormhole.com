@@ -1,17 +1,18 @@
-The Connect SDK enables fast, cheap, native USDC bridging powered by Circle's Cross Chain Transfer Protocol. Using [CCTP](./README.md) to transfer native USDC across chains with the [Connect SDK](../../../reference/sdk-docs/README.md) works very much like a standard Token Transfer with the SDK.
+# 使用 Connect SDK 进行 USDC 转账
 
-## Installation 
+Connect SDK 通过 Circle 的跨链转账协议（CCTP）支持快速、低成本的本地 USDC 跨链桥接功能。使用 [Connect SDK](../../../reference/sdk-docs/) 通过 [CCTP](./) 转移本地 USDC 到其他链的操作非常类似于使用 SDK 进行标准的代币转移。
 
-First install the SDK package 
+### 安装
+
+首先安装 SDK 包。
 
 ```sh
 npm install @wormhole-foundation/sdk
 ```
 
+### 使用方法
 
-## Usage
-
-To use the CCTP bridge, the platform must be imported and registered 
+要使用 CCTP 桥接功能，必须导入并注册平台。
 
 ```ts
 import { Wormhole } from "@wormhole-foundation/sdk";
@@ -22,7 +23,7 @@ import evm from "@wormhole-foundation/sdk/evm";
 const wh = await wormhole("Testnet", [evm]);
 ```
 
-## Manual Transfer
+### 手动转账
 
 ```ts
   const srcAddress = Wormhole.chainAddress("Ethereum", "0xdeadbeef...") 
@@ -36,9 +37,9 @@ const wh = await wormhole("Testnet", [evm]);
   console.log(xfer);
 ```
 
-A Manual transfer has 3 steps:
+手动转账包含三个步骤：
 
-1) Initiate The transfer by calling `initiateTransfer` and passing a [Signer](../../../reference/sdk-docs/README.md#signers) to sign the transactions. 
+1. 通过调用 `initiateTransfer` 并传递一个 [Signer](../../../reference/sdk-docs/#signers) 来签署交易，启动转账。
 
 ```ts
   console.log("Starting Transfer");
@@ -46,7 +47,7 @@ A Manual transfer has 3 steps:
   console.log(`Started Transfer: `, srcTxids);
 ```
 
-2) Wait for the Circle Attestation to be available, optionally passing a 
+2. 等待 Circle 证明变得可用，可选择性地传递参数。
 
 ```ts
   // See https://developers.circle.com/stablecoins/docs/required-block-confirmations for reasonable timeout settings
@@ -58,7 +59,7 @@ A Manual transfer has 3 steps:
   console.log(`Got Attestation: `, attestIds);
 ```
 
-3) Complete the transfer by calling, you guessed it, `completeTransfer` and again passing a Signer for the destination chain
+3. 通过调用 `completeTransfer`，并再次传递一个签名者用于目的链，来完成转账。
 
 ```ts
   console.log("Completing Transfer");
@@ -66,9 +67,9 @@ A Manual transfer has 3 steps:
   console.log(`Completed Transfer: `, dstTxids);
 ```
 
-## Automatic Transfer
+### 自动转账
 
-Using the Automatic Relaying feature is even easier and only involves initiating the transfer. The Relayer infrastructure will handle fetching and delivering the Attestation for you.
+使用自动中继功能更为简单，仅涉及启动转账。中继器基础设施将为您处理获取和交付证明的工作。
 
 ```ts
   const xfer = await wh.circleTransfer(
@@ -87,11 +88,11 @@ Using the Automatic Relaying feature is even easier and only involves initiating
 
 ```
 
-## Complete Partial Transfer
+### 完成部分转账
 
-In the case that a manual transfer is started but not finished, the transfer object can be reconstituted from only the source chain and transaction hash. 
+在手动转账启动但未完成的情况下，可以仅通过源链和交易哈希重新构建转账对象。
 
-This is especially useful in cases where a user has terminated their session prior to completing the transfer or even for debugging.
+这在用户在完成转账前终止会话，或者用于调试时特别有用。
 
 ```ts
   const timeout = 60 * 1000
@@ -106,4 +107,4 @@ This is especially useful in cases where a user has terminated their session pri
   console.log("Completed transfer: ", dstTxIds);
 ```
 
-The full source of a working example is available [here](https://github.com/wormhole-foundation/wormhole-sdk-ts/blob/develop/examples/src/cctp.ts)
+一个示例的完整源代码可以在[这里](https://github.com/wormhole-foundation/wormhole-sdk-ts/blob/develop/examples/src/cctp.ts)获取。
