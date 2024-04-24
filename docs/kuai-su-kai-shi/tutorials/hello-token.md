@@ -85,14 +85,14 @@ The 'attestWorkflow' 函数的功能如下：
 1.  在 Source 端: 使用我们要尝试发送的 token 调用 TokenBridge `attestToken` 函数。
 
     > 这将创建一个包含 token 详细信息的 payload，以便在接收端创建 token
-2.  Off chain: [Fetch the VAA](https://docs.wormhole.com/wormhole/reference/api-docs/swagger#v1-signed\_vaa-chain\_id-emitter-seq) using the Wormhole Chain ID, Emitter address (TokenBridge address) and sequence number from the `LogMessage` event.
+2.  链下：使用Wormhole Chain ID、Emitter 地址（TokenBridge 地址）和来自 `LogMessage` 事件的序列号[获取 VAA](https://docs.wormhole.com/wormhole/reference/api-docs/swagger#v1-signed\_vaa-chain\_id-emitter-seq)。
 
-    > This is the VAA that contains the token details with signatures from the Guardians
-3.  On the Receiving side: Calls the TokenBridge `createWrapped` function with the VAA from the previous step
+    > 这是包含来自 Guardians 签名的 token 详细信息的 VAA
+3.  在接收端：使用上一步的 VAA 调用 TokenBridge 的 `createWrapped` 函数。
 
-    > This allows the TokenBridge to create a wrapped version of the token we're sending so that it may mint the tokens to the receiver.
+    > 这允许 TokenBridge 为我们发送的 token 创建一个包装版本，以便它可以将 token 铸造给接收方。
 
-Once this is done, the TokenBridge on the receiving side can successfully mint the token sent.
+一旦完成，接收端的 TokenBridge 就能成功地铸造发送的 token。
 
 </details>
 
@@ -138,10 +138,10 @@ function sendCrossChainDeposit(
 
 * 调用 `sendCrossChainDeposit` 的用户（或合约）应**批准** `HelloToken` 合约使用用户 tokens 的 `amount`。在[此处](https://github.com/wormhole-foundation/hello-token/blob/main/test/HelloToken.t.sol#L37)查看如何在 forge 测试中完成此操作。
 * 我们必须将用户的 token 中的 `amount` 转移到 `HelloToken` 源合约中`IERC20(token).transferFrom(msg.sender, address(this), amount);`
-* We must encode the recipient address into a payload `bytes memory payload = abi.encode(recipient);`
-* We must ensure the correct amount of `msg.value` was passed in to send the token and payload.
-  * The cost to send a token is provided by the value returned by `wormhole.messageFee()` Currently this is 0 but _may_ change in the future, so don't assume it will always be 0.
-  * The cost to request a relay depends on the gas amount and receiver value you will need. `(deliveryCost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);`
+* 我们必须将接收方地址编码到 payload 中 `bytes memory payload = abi.encode(recipient);`
+* 我们必须确保传递了正确数量的 `msg.value` 来发送 token 和 payload。
+  * 发送 token 的成本由 `wormhole.messageFee()` 返回值决定，目前该值 0，但将来_可能_会发生变化，因此不要假设它总是为0。
+  * 请求中继的成本取决于你所需的 gas 量和接收器值。`(deliveryCost,) = wormholeRelayer.quoteEVMDeliveryPrice(targetChain, 0, GAS_LIMIT);`
 
 ```solidity
 function sendCrossChainDeposit(
@@ -182,9 +182,9 @@ public view returns (uint256 cost) {
 }
 ```
 
-### Implement Receiving Function
+### 实现接收函数
 
-Now, we'll implement the `TokenReceiver` abstract class - which is also included in the Wormhole Solidity SDK
+现在，我们将实现 `TokenReceiver` 抽象类——它也包含在 Wormhole Solidity SDK 中
 
 ```solidity
 struct TokenReceived {
@@ -204,21 +204,21 @@ function receivePayloadAndTokens(
 ) internal virtual {}
 ```
 
-After we call `sendTokenWithPayloadToEvm` on the source chain, the message goes through the standard Wormhole message lifecycle. Once a VAA is available, the delivery provider will call `receivePayloadAndTokens` on the target chain and target address specified, with the appropriate inputs.
+在源链上调用 `sendTokenWithPayloadToEvm` 后，信息将经历标准的 Wormhole 信息生命周期。一旦 VAA 可用，delivery provider 将在目标链和指定的目标地址上调用 `receivePayloadAndTokens`，并输入适当的内容。
 
-The arguments `payload`, `sourceAddress`, `sourceChain`, and `deliveryHash` are all the same as on the normal `receiveWormholeMessages` endpoint.
+参数 `payload`、`sourceAddress`、`sourceChain` 和 `deliveryHash` 都与普通的 `receiveWormholeMessages` 端点上的相同。
 
-Let's delve into the fields that are provided to us in the `TokenReceived` struct:
+让我们深入了解一下 `TokenReceived` 结构中提供给我们的字段：
 
-* **tokenHomeAddress** The same as the `token` field in the call to `sendTokenWithPayloadToEvm`, as that is the original address of the token unless the original token sent is a wormhole-wrapped token. In the case a wrapped token is sent, this will be the address of the original version of the token (on it’s native chain) in [wormhole address format](https://docs.wormhole.com/wormhole/reference/environments/evm#addresses) - i.e. left-padded with 12 zeros
-* **tokenHomeChain** The chain (in wormhole chain ID format) corresponding to the home address above - this will be the source chain, unless if the original token sent is a wormhole-wrapped asset, in which case it will be the chain of the unwrapped version of the token.
-* **tokenAddress** This is the address of the IERC20 token on this chain (the target chain) that has been transferred to this contract. If tokenHomeChain == this chain, this will be the same as tokenHomeAddress; otherwise, it will be the wormhole-wrapped version of the token sent.
-* **amount** This is the amount of the token that has been sent to you - the units being the same as the original token. Note that since TokenBridge only sends with 8 decimals of precision, if your token had 18 decimals, this will be the ‘amount’ you sent, rounded down to the nearest multiple of 10^10.
-* **amountNormalized** This is the amount of token divided by (1 if decimals ≤ 8, else 10^(decimals - 8))
+* **tokenHomeAddress** 与调用 `sendTokenWithPayloadToEvm` 时的 `token` 字段相同，因为这是 token 的原始地址，除非发送的原始 token 是 wormhole 包装的 token。如果发送的是包装的 token，则该地址将是原始版本 token（在其原生链）的地址，采用 [wormhole 地址格式](https://docs.wormhole.com/wormhole/reference/environments/evm#addresses)，即左侧填充 12 个 0。
+* **tokenHomeChain** 与上述主地址相对应的链（wormhole 链 ID 格式）——这将是源链，除非发送的原始 token 是 wormhole 包装的资产，在这种情况下它将是未包装版本 token 的链。
+* **tokenAddress** 这是该链上（目标链）的 IERC20 token 的地址，该 token 地址已转移到此合约。如果 tokenHomeChain == 该链，则地址将与 tokenHomeAddress 相同；否则，它将是发送的 token 的 wormhole 包装版本。
+* **amount** 这是已发送给你的 token 数量——单位与原始 token 相同。请注意，由于 TokenBridge 只以 8 位小数的精度发送，如果你的 token 有 18 位小数，这将是你发送的“amount”，四舍五入到最接近的 10^10 的 倍数。
+* **amountNormalized** 这是 token 数量除以 (1 if decimals ≤ 8, else 10^(decimals - 8))
 
-Since all we intend to do is send the received token to the recipient, our fields of interest are **payload** (containing recipient), **receivedTokens\[0].tokenAddress** (token we received), and **receivedTokens\[0].amount** (amount of token we received and that we must send)
+由于我们要做的只是将收到的 token 发送给接收方，因此我们感兴趣的字段是 **payload**（包含接收方）、**receivedTokens\[0].tokenAddress**（我们收到的token）和 **receivedTokens\[0].amount**（我们收到并必须发送的 token 数量）。
 
-We can complete the implementation as follows:
+我们可以按照以下方式完成实现：
 
 ```solidity
 function receivePayloadAndTokens(
@@ -236,21 +236,21 @@ function receivePayloadAndTokens(
 }
 ```
 
-> Note: In this case, we don't need to prevent duplicate deliveries using the delivery hash, because TokenBridge already provides a form of duplicate prevention when redeeming sent tokens
+> 注意：在这种情况下，我们不需要使用传递 hash 来防止重复传递，因为 TokenBridge 在履行发送 token 时已经提供了一种预防重复的方式。
 
-And voila! We have a [complete working example](https://github.com/wormhole-foundation/hello-token/blob/main/src/HelloToken.sol) of a cross-chain application that uses TokenBridge to send and receive tokens!
+好了！我们就有了一个使用 TokenBridge 发送和接收 tokens 跨链应用程序的[完整运行示例](https://github.com/wormhole-foundation/hello-token/blob/main/src/HelloToken.sol)！
 
-Try [cloning and running HelloToken](https://github.com/wormhole-foundation/hello-token/tree/main#readme) to see this example work for yourself!
+尝试[克隆并运行 HelloToken](https://github.com/wormhole-foundation/hello-token/tree/main#readme) 来亲自看看这个示例是如何运行的！
 
-## How do these Solidity Helpers Work?
+## 这些 Solidity Helpers 如何工作？
 
-Let’s walk through the details of `sendTokenWithPayloadToEvm` and `receivePayloadAndTokens` to see how they make use of the IWormholeRelayer interface and IWormholeReceiver interface to send and receive tokens.
+让我们来了解一下 `sendTokenWithPayloadToEvm` 和 `receivePayloadAndTokens` 的细节，看看它们时如何利用 IWormholeRelayer 接口和 IWormholeReceiver 接口来发送和接收 tokens 的。
 
-### Sending a Token
+### 发送 Token
 
-To send a token, we make use of the EVM TokenBridge contract, specifically the `transferTokensWithPayload` method ([implementation](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/bridge/Bridge.sol#L191))
+为了发送 token，我们使用 EVM TokenBridge 合约，特别是 `transferTokensWithPayload` 方法（[实现方式](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/bridge/Bridge.sol#L191)）
 
-> Note: We leave the `payload` field here blank because we are using the `payload` field on the IWormholeRelayer interface instead
+> 注意：我们将此处的 `payload` 字段留空，因为我们使用的是 IWormholeRelayer 接口上的 `payload` 字段。
 
 ```solidity
     /*
@@ -275,13 +275,13 @@ To send a token, we make use of the EVM TokenBridge contract, specifically the `
     ) public payable nonReentrant returns (uint64 sequence)
 ```
 
-TokenBridge implements this function by publishing a wormhole message to the blockchain logs that indicates that `amount` of the `token` was sent (with the intended address being `recipient` on `recipientChain`). TokenBridge then returns the sequence number of this published wormhole message.
+TokenBridge 通过向区块链日志发布 wormhole 信息来实现此功能，该信息表明`token` 的 `amount` 已被发送（目标地址为 `recipientChain` 上的 `recipient` ）。然后，TokenBridge 返回已发已发布 wormhole 信息的序列号。
 
-The `transferTokens` function in the Wormhole Solidity SDK makes use of this TokenBridge endpoint by
+Wormhole Solidity SDK 中的 `transferTokens` 函数通过以下方式使用该 TokenBridge 端点：
 
-* approving the TokenBridge to spend `amount` of our ERC20 `token`
-* calling `transferTokensWithPayload` with the appropriate inputs
-* returning a `VaaKey` struct containing information about the published wormhole message for the token transfer
+* 批准 TokenBridge 使用我们的 ERC20 `token` 的 `amount`
+* 通过适当的输入调用 `transferTokensWithPayload`
+* 返回一个 `VaaKey` 结构体，其中包含已发布的 token 传输的 wormhole 信息。
 
 ```solidity
 function transferTokens(
@@ -305,7 +305,7 @@ function transferTokens(
 }
 ```
 
-Now, it is our task to get the signed VAA corresponding to this published token bridge wormhole message to be delivered to our target chain HelloToken contract. To do this, we make use of the [sendVaasToEvm](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol#L149) endpoint in the IWormholeRelayer interface.
+现在，我们的任务是获取与发布的 token 桥 wormhole 信息相对应的已签名 VAA， 并将其传递到我们的目标链 HelloToken 合约。为此，我们使用 IWormholeRelayer 接口中的 [sendVaasToEvm](https://github.com/wormhole-foundation/wormhole/blob/main/ethereum/contracts/interfaces/relayer/IWormholeRelayer.sol#L149) 端点。
 
 ```solidity
 function sendVaasToEvm(
@@ -318,7 +318,7 @@ function sendVaasToEvm(
 ) external payable returns (uint64 sequence);
 ```
 
-This allows us to specify existing wormhole message(s) and get the signed VAA(s) corresponding to those messages delivered to the targetAddress (in the `additionalVaas` field of `receiveWormholeMessages`).
+这样，我们就可以指定现有的 wormhole 信息，并获得与传递到 targetAddress（在 `receiveWormholeMessages` 的 `additionalVaas` 字段中）的信息相对应的签名 VAA(s)。
 
 ```solidity
 function sendTokenWithPayloadToEvm(
@@ -342,26 +342,26 @@ function sendTokenWithPayloadToEvm(
 }
 ```
 
-> Note: If you wish to send multiple different tokens along with the payload, the `sendTokenWithPayloadToEvm` helper as currently implemented will not help (as it sends only one token). However, you can still call `transferToken` twice and request delivery of both of those TokenBridge wormhole messages by providing two `VaaKey` structs in the `vaaKeys` array. See an example of HelloToken with more than one token [here](https://github.com/wormhole-foundation/hello-token/blob/main/src/example-extensions/HelloMultipleTokens.sol).
+> 注意：如果你想连同 payload 一起发送多个不同的 tokens，目前实现的 `sendTokenWithPayloadToEvm` helper 将无能为力（因为它只发送一个 token）。不过，你仍然可以调用两次 `transferToken`，并通过在 `vaaKeys` 数组中提供两个 `VaaKey` 结构来请求传递这两个 TokenBridge wormhole 信息。请点击[此处](https://github.com/wormhole-foundation/hello-token/blob/main/src/example-extensions/HelloMultipleTokens.sol)查看带有多个 token 的 HelloToken 示例。
 
-### Receiving a Token
+### 接收 Token
 
-We know that our `sendVaasToEvm` call will cause `receiveWormholeMessages` on `targetAddress` to be called with
+我们知道，我们的 `sendVaasToEvm` 调用会导致 `targetAddress` 上的 `receiveWormholeMessages` 被调用，调用条件是
 
-* The payload as the encoded `recipient` address
-* The `additionalVaas` field being an array of length 1, with the first element being the signed VAA corresponding to our token bridge transfer
+* payload 作为编码的 `recipient` 地址
+* `additionalVaas` 字段是一个长度为 1 的数组，第一个元素是与我们的 token 桥传递相对应的签名 VAA。
 
-Crucially, we don't have the transferred tokens yet! There are a few things that we need to do before gaining access to these tokens.
+关键是，我们还没有要传递的 tokens！在获得这些 tokens 之前，我们需要做几件事。
 
-1.  We parse the signed VAA, and check that
+1.  我们解析已签名的 VAA，并检查
 
-    * The emitterAddress of the VAA is a valid token bridge - i.e. the message was published by one of the TokenBridge contracts
-    * The transfer was sent to this address
+    * VAA 的 emitterAddress 是一个有效的 token 桥，即信息由其中一个 TokenBridge 合约发布
+    * transfer 已发送到该地址
 
-    > note: this step isn’t strictly necessary because the call to `completeTransferWithPayload` would fail if these were not true\*\*
-2. We call `tokenBridge.completeTransferWithPayload`, passing the VAA - this completes the transfer of the tokens and causes us to receive the (potentially wormhole-wrapped) transferred token
-3. We return a `TokenReceived` struct containing useful information about the transfer
-4. We call `receivePayloadAndTokens` with the appropriate inputs
+    > 注意：严格来说，这一步并非必要的，因为如果这些信息不为真，调用 `completeTransferWithPayload` 就会失败\*\*
+2. 我们调用 `tokenBridge.completeTransferWithPayload`，同时传递 VAA——这样就完成了 tokens 的传输，并使我们收到（可能被 wormhole 包装的）传输 token
+3. 我们返回一个 `TokenReceived` 结构，其中包含有关传输的有用信息
+4. 我们使用适当的输入调用 `receivePayloadAndTokens`
 
 ```solidity
 function receiveWormholeMessages(
@@ -406,16 +406,16 @@ function receiveWormholeMessages(
 }
 ```
 
-See the full implementation of the Wormhole Relayer SDK helpers [here](https://github.com/wormhole-foundation/wormhole-solidity-sdk/blob/main/src/WormholeRelayerSDK.sol)
+点击[此处](https://github.com/wormhole-foundation/wormhole-solidity-sdk/blob/main/src/WormholeRelayerSDK.sol)查看 Wormhole Relayer SDK helpers 的完整实现
 
-Also, see a version of HelloToken implemented without any Wormhole Relayer SDK helpers [here](https://github.com/wormhole-foundation/hello-token/blob/main/src/example-extensions/HelloTokenWithoutSDK.sol)
+另外，请点击[此处](https://github.com/wormhole-foundation/hello-token/blob/main/src/example-extensions/HelloTokenWithoutSDK.sol)查看不使用任何 Wormhole Relayer SDK helpers 的情况下实现 HelloToken 的版本。
 
-as well as a version of HelloToken where native currency is deposited [here](https://github.com/wormhole-foundation/hello-token/blob/main/src/example-extensions/HelloTokenNative.sol)
+同时，还有一个版本的 HelloToken，在[这里](https://github.com/wormhole-foundation/hello-token/blob/main/src/example-extensions/HelloTokenNative.sol)存放了原生代币。
 
 {% hint style="info" %}
-### Wormhole integration complete?
+### Wormhole 集成完成
 
-Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
+请告诉我们，这样我们就可以将你的项目列入我们的生态目录，并将你介绍给我们的全球多链社区！
 
-[Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
+[立即联系！](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
 {% endhint %}
