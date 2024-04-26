@@ -4,7 +4,7 @@
 
 ## 快速开始
 
-* [开发跨链Dapps](kuai-su-kai-shi/cross-chain-dev/README.md)
+* [开发跨链 Dapps](kuai-su-kai-shi/cross-chain-dev/README.md)
   * [标准中继器](kuai-su-kai-shi/cross-chain-dev/standard-relayer.md)
   * [专用中继器](kuai-su-kai-shi/cross-chain-dev/specialized-relayer.md)
 * [教程](kuai-su-kai-shi/tutorials/README.md)
