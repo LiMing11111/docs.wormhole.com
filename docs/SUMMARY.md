@@ -14,8 +14,8 @@
   * [Hello Token](kuai-su-kai-shi/tutorials/hello-token.md)
   * [CCTP](kuai-su-kai-shi/tutorials/cctp/README.md)
     * [使用 Connect SDK 进行 USDC 转账](kuai-su-kai-shi/tutorials/cctp/sdk.md)
-  * [Simple Relayer](kuai-su-kai-shi/tutorials/relayer/README.md)
-    * [Advanced Relayer Example](kuai-su-kai-shi/tutorials/relayer/advanced-example.md)
+  * [简单中继器](kuai-su-kai-shi/tutorials/relayer/README.md)
+    * [高级中继器示例](kuai-su-kai-shi/tutorials/relayer/advanced-example.md)
 * [Demos](kuai-su-kai-shi/demos.md)
 * [Wormhole Connect: 让桥接变得更容易](kuai-su-kai-shi/wh-connect.md)
 

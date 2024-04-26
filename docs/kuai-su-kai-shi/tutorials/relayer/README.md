@@ -1,40 +1,40 @@
-# Simple Relayer
+# 简单中继器
 
-## Relayer Engine
+## 中继器引擎
 
-The Relayer Engine is a package meant to provide the structure and a starting point for a custom relayer.
+中继器引擎是一个旨在为自定义中继器提供结构和起点的包。
 
-With the Relayer Engine, a developer can write specific logic for filtering to receive only the messages they care about.
+使用中继器引擎，开发人员可以编写特定的逻辑进行过滤，只接收他们关心的信息。
 
-Once a wormhole message is received, the developer may apply additional logic to parse custom payloads or submit the VAA to one or many destination chains.
+一旦收到 wormhole 消息，开发人员可以应用附加的逻辑来解析自定义 payloads 或将 VAA 提交到一个或多个目标链。
 
-To use the Relayer engine, a developer may specify how to relay wormhole messages for their app using an idiomatic express/koa middleware inspired api then let the library handle all the details!
+要使用中继器引擎，开发人员可以使用惯用的 express/koa 中间件启发的 api，来为自己的应用程序指定如何中继wormhole 信息，然后让库处理所有细节！
 
-Checkout the [quick start](./#quick-start) example here, or for a more advanced relayer app, see the [advanced example](advanced-example.md)
+在此处查看[快速开始](./#quick-start)示例，或查看更高级的中继器应用程序，请参阅[高级示例](advanced-example.md)。
 
-## Quick Start
+## 快速开始
 
-The source for this example is available [here](https://github.com/wormhole-foundation/relayer-engine/blob/main/examples/simple/src/app.ts)
+该示例的源代码可在[此处](https://github.com/wormhole-foundation/relayer-engine/blob/main/examples/simple/src/app.ts)获取
 
-### Install Package
+### 安装包
 
-First, install the `relayer-engine` package with your favorite package manager
+首先，使用你最喜欢的包管理器安装 `relayer-engine` 包
 
 ```sh
 npm i @wormhole-foundation/relayer-engine
 ```
 
-### Start Background Processes
+### 启动后台进程
 
-> note: These processes _must_ be running in order for the relayer app below to work
+> 注意：这些进程_必须_ 被运行，下面的中继器应用程序才能正常工作
 
-Next, we must start a Spy to listen for available VAAs published on the guardian network as well as a persistence layer, in this case we're using Redis.
+接下来，我们必须启动 Spy来监听守护者网络上发布的可用 VAAs 以及持久层，在本例中我们使用 Redis。
 
-More details about the Spy are available in the [docs](https://docs.wormhole.com/wormhole/explore-wormhole/spy)
+有关 Spy 的更多详细信息，请参阅[文档](https://docs.wormhole.com/wormhole/explore-wormhole/spy)
 
-#### Wormhole Network Spy
+#### Wormhole 网络 Spy
 
-In order for our Relayer app to receive messages, a local Spy must be running that watches the guardian network. Our relayer app will receive updates from this Spy.
+为了让我们的中继器应用接收消息，必须运行一个本地 Spy 来监视守护者网络。我们的中继器应用将接收来自此 Spy 的更新内容。
 
 <details>
 
@@ -68,23 +68,23 @@ spy \
 
 </details>
 
-#### Redis Persistence
+#### Redis 持久性
 
-> Note: While we're using Redis here, the persistence layer can be swapped out for some other db by implementing the appropriate [interface](https://github.com/wormhole-foundation/relayer-engine/blob/main/relayer/storage/redis-storage.ts).
+> 注意：虽然我们在这里使用 Redis，但也可以通过实现相应的[接口](https://github.com/wormhole-foundation/relayer-engine/blob/main/relayer/storage/redis-storage.ts)，将持久层换成其他数据库。
 
-A Redis instance must also be available to persist job data for fetching VAAs from the Spy.
+Redis 实例也必须可用，用于持久化存储从 Spy 获取 VAAs 的工作数据。
 
 ```bash
 docker run --rm -p 6379:6379 --name redis-docker -d redis
 ```
 
-### Simple Relayer Code Example
+### 简单中继器代码示例
 
-In the following example, we'll:
+在下面的示例中，我们将：
 
-1. Set up a StandardRelayerApp, passing configuration options for our Relayer
-2. Add a filter to capture only those messages our app cares about with a callback to do _something_ with the VAA once we've gotten it
-3. Start the Relayer app
+1. 设置一个 StandardRelayerApp，为我们的中继器传递配置选项
+2. 添加一个过滤器，只捕获我们的应用程序所关心的信息，并在获取 VAA 后通过回调对其进行处理
+3. 启动中继器应用程序
 
 ```ts
 import {
@@ -127,9 +127,9 @@ import { CHAIN_ID_SOLANA } from "@certusone/wormhole-sdk";
 })();
 ```
 
-#### Explanation
+#### 解释
 
-The first meaningful line instantiates the `StandardRelayerApp`, which is a subclass of the `RelayerApp` with common defaults.
+第一行有意义的代码实例化了 `StandardRelayerApp`，它是 `RelayerApp` 的子类，具有通用默认值。
 
 ```ts
 export class StandardRelayerApp<
@@ -139,7 +139,7 @@ export class StandardRelayerApp<
   constructor(env: Environment, opts: StandardRelayerAppOpts) {
 ```
 
-The only field we pass in the `StandardRelayerAppOpts` is the name to help with identifying log messages and reserve a namespace in Redis.
+我们在 `StandardRelayerAppOpts` 中传递的唯一字段是 name，用于帮助识别日志信息并在 Redis 中保留命名空间。
 
 <details>
 
@@ -163,9 +163,9 @@ The only field we pass in the `StandardRelayerAppOpts` is the name to help with 
 
 </details>
 
-The next meaningful line in the example adds a filter middleware component. This middleware will cause the Relayer app to request a subscription from the Spy for any VAAs that match the criteria and invoke the callback with the VAA.
+示例中的下一个有意义的行添加了一个过滤器中间件组件。该中间件将使中继器应用程序向 Spy 请求订阅任何符合条件的 VAAs，并调用 VAA 的回调函数。
 
-If you'd like your program to subscribe to multiple chains and addresses, the same method can be called several times or the `multiple` helper can be used.
+如果希望程序订阅多个链和地址，可以多次调用同一方法或使用 `multiple` helper。
 
 ```ts
 app.multiple(
@@ -177,18 +177,18 @@ app.multiple(
 );
 ```
 
-The last line in the simple example runs `await app.listen()`, which will start the relayer engine. Once started, the relayer engine will issue subscription requests to the spy and begin any other workflows (e.g. tracking missed VAAs).
+简单示例中的最后一行运行 `await app.listen()`，这将启动中继引擎。一旦启动，中继引擎就会向 spy 发出订阅请求，并开始任何其他工作流（追踪错过的VAA）。
 
-This will run until the process is killed or it encounters an unrecoverable error. If you'd like to shut down the relayer gracefully, call `app.stop()`.
+这将一直运行，直到进程被终止或遇到不可恢复的错误。如果您想正常关闭中继器，请调用 `app.stop()`。
 
-### Advanced Example
+### 高级示例
 
-For a more advanced example that details other middleware and more complex configuration and actions including a built in UI, see the [Advanced Tutorial](advanced-example.md)
+有关详细介绍其他中间件和更复杂的配置和操作（包括内置 UI）的更高级示例，请参阅[高级教程](advanced-example.md)
 
 {% hint style="info" %}
-### Wormhole integration complete?
+### Wormhole 集成完成了吗？
 
-Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
+请告诉我们，这样我们就可以将你的项目列入我们的生态目录，并将你介绍给我们的全球多链社区！
 
-[Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
+[立即联系！](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
 {% endhint %}

@@ -1,16 +1,16 @@
-# Advanced Relayer Example
+# 高级中继器示例
 
-This example details a more complex implementation of a Relayer Application. For a simple example see this [example](./#simple-relayer-code-example)
+本示例详细介绍了中继器应用程序更复杂的实现。有关简单示例，请参阅此[示例](./#simple-relayer-code-example)
 
-The source for this example is available [here](https://github.com/wormhole-foundation/relayer-engine/blob/main/examples/advanced/src/app.ts)
+本示例的源代码可在[此处](https://github.com/wormhole-foundation/relayer-engine/blob/main/examples/advanced/src/app.ts)获取
 
-## Setup
+## 设置
 
-> note: In order to run the Spy and Redis for this tutorial, you must have `docker` installed.
+> 注意：为了运行本教程中的 Spy 和 Redis，你必须安装 `docker`。
 
-### Get the code
+### 获取代码
 
-Clone the repository, `cd` into the directory, and install the requirements.
+克隆仓库， `cd` 进入该目录，然后安装依赖。
 
 ```sh
 git clone https://github.com/wormhole-foundation/relayer-engine.git
@@ -18,35 +18,35 @@ cd relayer-engine/examples/advanced/
 npm i
 ```
 
-## Run it
+## 运行
 
-### Start the background services
+### 启动后台服务
 
-Start the Spy to subscribe to gossiped messages on the Guardian network.
+启动 Spy 来订阅 Guardian 网络上的各类信息。
 
 ```sh
 npm run testnet-spy
 ```
 
-In another CLI window, start Redis. For this application, Redis is used as the persistence layer to keep track of VAAs we've seen.
+在另一个 CLI 窗口中，启动 Redis。对于这个应用程序，Redis 被用作持久化层来跟踪我们已经看到的 VAAs。
 
 ```sh
 npm run redis
 ```
 
-### Start the relayer
+### 启动中继器
 
-Once the background processes are running, we can start the relayer. This will subscribe to relevant messages from the Spy and track VAAs, taking some action when one is received.
+一旦后台进程运行起来，我们就可以启动中继器。它将订阅来自 Spy 的相关消息并跟踪 VAAs，并在收到消息时采取一些行动。
 
 ```sh
 npm run start
 ```
 
-## Code Walkthrough
+## 代码演示
 
 ### Context
 
-The first meaningful line is a Type declaration for the `Context` we want to provide our Relayer app.
+第一行是我们要为 Relayer 应用程序提供的 `Context` 的类型声明。
 
 ```ts
 export type MyRelayerContext = LoggingContext &
@@ -57,19 +57,19 @@ export type MyRelayerContext = LoggingContext &
   WalletContext;
 ```
 
-This type, which we later use to parameterize the generic `RelayerApp`, specifies the union of `Context` objects that are available to the `RelayerApp`.
+这种类型，我们稍后会使用它来参数化通用的 `RelayerApp`，它指定了 `RelayerApp` 可用的 `Context` 对象的联合。
 
-Because the `Context` object is passed to the callback for processors, providing a type parameterized type definition ensures the appropriate fields are available within the callback on the `Context` object.
+由于 `Context` 对象会被传递给处理器的回调函数，因此提供一个类型参数化的类型定义可以确保在 `Context` 对象的回调中使用相应的字段。
 
-### App Creation
+### 应用程序创建
 
-Next we instantiate a `RelayerApp`, passing our `Context` type to parameterize it.
+接下来，我们实例化一个 `RelayerApp`，通过 `Context` 类型对其进行参数化。
 
 ```ts
 const app = new RelayerApp<MyRelayerContext>(Environment.TESTNET);
 ```
 
-For this example we've defined a class, `ApiController`, to provide methods we'll pass to our processor callbacks. Note that the `ctx` argument type matches the `Context` type we defined.
+在本示例中，我们定义了一个类 `ApiController`，用于提供我们将传递给处理器回调的方法。请注意，`ctx` 参数类型与我们定义的 `Context` 类型一致。
 
 ```ts
 export class ApiController {
@@ -79,9 +79,9 @@ export class ApiController {
 }
 ```
 
-This is not required but a pattern like this helps organize the codebase as the `RelayerApp` grows.
+这不是必须的，但这样的模式有助于随着 `RelayerApp` 的发展来组织代码库。
 
-We instantiate our controller class and begin to configure our application by passing the Spy URL, storage layer, and logger.
+我们实例化我们的控制器类并通过传递 Spy URL、存储层和日志记录器开始配置我们的应用程序。
 
 ```ts
 const fundsCtrl = new ApiController();
@@ -101,19 +101,19 @@ app.logger(rootLogger);
 
 ### Middleware
 
-With our app configured, we can begin to add `Middleware`.
+配置好应用程序后，我们就可以开始添加 `Middleware` 了。
 
-`Middleware` is the term for the functional components we wish to apply to each VAA received.
+`Middleware` 是我们希望应用于每个收到的 VAA 的功能组件的术语。
 
-The `RelayerApp` defines a `use` method which accepts one or more `Middleware` instances, also parameterized with a `Context` type.
+`RelayerApp` 定义了一个 `use` 方法，该方法接受一个或多个 `Middleware` 实例，并且也用 `Context` 类型进行参数化。
 
 ```ts
 use(...middleware: Middleware<ContextT>[] | ErrorMiddleware<ContextT>[])
 ```
 
-By passing the `use` method an instance of some `Middleware`, we add it to the pipeline of handlers invoked by the `RelayerApp`.
+通过向 `use` 方法传递某些 `Middleware` 的实例，我们将其添加到 `RelayerApp` 调用的管道处理程序中。
 
-> Note that the order the `Middleware` is added here matters since a VAA is passed through each in the same order.
+> 请注意，这里添加 `Middleware` 的顺序很重要，因为 VAA 会以相同的顺序通过每个中间件。
 
 ```ts
 // we want an instance of a logger available on the context
@@ -130,13 +130,13 @@ app.use(stagingArea());
 app.use(sourceTx());
 ```
 
-### Subscriptions
+### 订阅
 
-With our `Middleware` setup, we can configure a subscription to receive only the VAAs we care about.
+通过我们的 `Middleware` 设置，我们可以配置一个订阅，用了仅接收我们关心的 VAAs。
 
-Here we set up a subscription request to receive VAAs that originated from Solana and were emitted by the address `DZnkkTmCiFWfYTfT41X3Rd1kDgozqzxWaHqsw6W4x2oe`.
+在这里，我们设置了一个订阅请求，以接收来自 Solana 的 VAAs，且由以下地址发出 `DZnkkTmCiFWfYTfT41X3Rd1kDgozqzxWaHqsw6W4x2oe`。
 
-On receipt of a VAA that matches this filter, the `fundsCtrl.processFundsTransfer` callback is invoked with an instance of the `Context` object that has already been passed through the `Middleware` we set up before.
+在收到与此过滤器匹配的 VAA 后，将调用 `fundsCtrl.processFundsTransfer` 回调函数，并传入一个已经通过我们之前设置的 `Middleware` 处理的 `Context` 对象实例。
 
 ```ts
 app
@@ -147,7 +147,7 @@ app
   );
 ```
 
-To subscribe to more chains or addresses, this pattern can be repeated or the `multiple` method can be called with an object of `ChainId` to `Address`
+要订阅更多链或地址，可以重复此模式，或者使用一个从 `ChainId` 映射到 `Address` 的对象调用 `multiple` 方法。
 
 ```ts
 app.multiple(
@@ -159,11 +159,11 @@ app.multiple(
 );
 ```
 
-### Error Handling
+### 错误处理
 
-The last `Middleware` we apply is an error handler, which will be called any time an upstream `Middleware` component throws an error.
+我们应用的最后一个 `Middleware` 是一个错误处理程序，它将在其前面的任何 `Middleware` 组件抛出错误时被调用。
 
-Note that there are 3 arguments to this function which hints to the `RelayerApp` that it should be used to process errors.
+请注意，该函数有 3 个参数，这提示 `RelayerApp` 应该使用它来处理错误。
 
 ```ts
 app.use(async (err, ctx, next) => {
@@ -171,30 +171,30 @@ app.use(async (err, ctx, next) => {
 });
 ```
 
-### Start listening
+### 启动监听
 
-Finally, calling `app.listen()` will start the `RelayerApp`, issuing subscription requests and handling VAAs as we've configured it.
+最后，调用 `app.listen()` 将启动 `RelayerApp`，发起订阅请求并按我们配置的方式处理 VAAs。
 
-The `listen` method is async and `await`-ing it will block until the program dies from an unrecoverable error, the process is killed, or the app is stopped with `app.stop()`.
+`listen` 方法是异步的，使用 `await` 等待它将阻塞程序，直到程序因不可恢复的错误而结束、进程被终止，或使用 `app.stop()` 停止应用程序。
 
 ### Bonus UI
 
-For this example, we've provided a default UI using `koa`.
+在本例中，我们使用 `koa` 提供了默认 UI。
 
-When the program is running, you may open a browser to `http://localhost:3000/ui` to see details about the running application.
+当程序运行时，你可以打开浏览器 `http://localhost:3000/ui` 来查看运行中程序的详细信息。
 
-## Going further
+## 更进一步
 
-The included default functionality may be insufficient for your use case.
+其中包含的默认功能可能无法满足您的使用要求。
 
-If you'd like to apply some specific intermediate processing steps, consider implementing some custom `Middleware`. Be sure to include the appropriate `Context` in the `RelayerApp` type parameterization for any fields you wish to have added to the `Context` object passed to downstream `Middleware`.
+如果你想要应用一些特定的中间处理步骤，可以考虑实现一些自定义的 `Middleware`。在为 `RelayerApp` 类型参数化时，确保包含适当的 `Context`，以便将你希望添加的任何字段加入到传递给下游 `Middleware` 的 `Context` 对象中。
 
-If you'd prefer a storage layer besides redis, simply implement the [storage](https://github.com/wormhole-foundation/relayer-engine/blob/main/relayer/storage/storage.ts) interface.
+如果您希望使用 redis 以外的存储层，只需实现[存储](https://github.com/wormhole-foundation/relayer-engine/blob/main/relayer/storage/storage.ts)接口即可。
 
 {% hint style="info" %}
-### Wormhole integration complete?
+### Wormhole 集成完成了吗？
 
-Let us know so we can list your project in our ecosystem directory and introduce you to our global, multichain community!
+请告诉我们，这样我们就可以将你的项目列入我们的生态目录，并将你介绍给我们的全球多链社区！
 
-[Reach out now!](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
+[立即联系！](https://forms.clickup.com/45049775/f/1aytxf-10244/JKYWRUQ70AUI99F32Q)
 {% endhint %}

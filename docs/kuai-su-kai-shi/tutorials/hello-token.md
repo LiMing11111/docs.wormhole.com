@@ -413,7 +413,7 @@ function receiveWormholeMessages(
 同时，还有一个版本的 HelloToken，在[这里](https://github.com/wormhole-foundation/hello-token/blob/main/src/example-extensions/HelloTokenNative.sol)存放了原生代币。
 
 {% hint style="info" %}
-### Wormhole 集成完成
+### Wormhole 集成完成了吗？
 
 请告诉我们，这样我们就可以将你的项目列入我们的生态目录，并将你介绍给我们的全球多链社区！
 

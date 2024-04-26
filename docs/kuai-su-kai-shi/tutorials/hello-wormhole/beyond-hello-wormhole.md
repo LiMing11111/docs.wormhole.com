@@ -181,7 +181,7 @@ function sendVaasToEvm(
 有关此用法的示例，请参阅 Wormhole Solidity SDK 的 [sendTokenWithPayloadToEvm](https://github.com/wormhole-foundation/wormhole-solidity-sdk/blob/main/src/WormholeRelayerSDK.sol#L131) 实现，它使用 TokenBridge wormhole 模块发送 tokens！
 
 {% hint style="info" %}
-### Wormhole 集合完成了吗？
+### Wormhole 集成完成了吗？
 
 请告诉我们，这样我们就可以将你的项目列入我们的生态目录，并将你介绍给我们的全球多链社区！
 
